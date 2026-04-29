@@ -1,26 +1,29 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Basic Education – Interactive Learning</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basic Education Reading Hub</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
 
   :root {
-    --bg: #f4f1eb;
-    --card: #ffffff;
-    --ink: #1a1a2e;
-    --muted: #6b7280;
+    --bg: #f5f0e8;
+    --surface: #fffdf8;
+    --surface2: #f0ebe0;
+    --ink: #1a1510;
+    --ink-soft: #5a5248;
+    --ink-faint: #9a9088;
     --accent1: #2d6a4f;
     --accent2: #e76f51;
     --accent3: #457b9d;
-    --accent4: #9b5de5;
-    --accent5: #f4a261;
-    --accent6: #e63946;
-    --shadow: 0 4px 24px rgba(0,0,0,0.08);
-    --radius: 18px;
-    --transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+    --correct: #2d6a4f;
+    --wrong: #c1121f;
+    --gold: #c9a84c;
+    --shadow: 0 4px 24px rgba(26,21,16,0.10);
+    --shadow-lg: 0 12px 48px rgba(26,21,16,0.15);
+    --radius: 16px;
+    --radius-sm: 8px;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,1016 +36,1110 @@
     overflow-x: hidden;
   }
 
-  /* ── PROGRESS BAR ── */
-  #progress-bar-wrap {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
-    height: 5px; background: rgba(0,0,0,0.08);
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
   }
-  #progress-bar {
-    height: 100%; background: linear-gradient(90deg, var(--accent1), var(--accent2));
-    width: 0%; transition: width 0.5s ease;
-  }
-
-  /* ── TOP NAV ── */
-  nav {
-    position: fixed; top: 5px; left: 0; right: 0; z-index: 900;
-    background: rgba(244,241,235,0.92);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(0,0,0,0.07);
-    padding: 0 28px;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 58px;
-  }
-  .nav-logo {
+  .logo {
     font-family: 'Playfair Display', serif;
-    font-weight: 900; font-size: 1.15rem; letter-spacing: -0.5px;
-    color: var(--ink);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .logo span { color: var(--gold); }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    flex: 1;
+    max-width: 320px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    white-space: nowrap;
+  }
+
+  /* ── TOPIC NAV ── */
+  .topic-nav {
+    background: var(--surface);
+    border-bottom: 1px solid rgba(26,21,16,0.08);
+    display: flex;
+    overflow-x: auto;
+    gap: 0;
+    scrollbar-width: none;
+  }
+  .topic-nav::-webkit-scrollbar { display: none; }
+  .topic-btn {
+    padding: 1rem 2rem;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--ink-soft);
     cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+    transition: color 0.2s;
   }
-  .nav-links {
-    display: flex; gap: 6px; list-style: none;
+  .topic-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%; right: 50%;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
   }
-  .nav-links li a {
-    text-decoration: none; font-size: 0.78rem; font-weight: 500;
-    color: var(--muted); padding: 6px 12px; border-radius: 30px;
-    transition: var(--transition);
+  .topic-btn.active { color: var(--ink); }
+  .topic-btn.active::after { left: 16px; right: 16px; }
+  .topic-btn[data-topic="0"].active::after { background: var(--accent3); }
+  .topic-btn[data-topic="1"].active::after { background: var(--accent2); }
+  .topic-btn[data-topic="2"].active::after { background: var(--accent1); }
+  .topic-btn .icon { margin-right: 6px; }
+
+  /* ── SECTION TABS ── */
+  .section-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 1.5rem 2rem 0;
+    max-width: 960px;
+    margin: 0 auto;
   }
-  .nav-links li a:hover, .nav-links li a.active {
-    background: var(--ink); color: #fff;
+  .sec-btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 99px;
+    border: 2px solid transparent;
+    background: var(--surface2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.2s;
   }
-  .nav-toggle {
-    display: none; background: none; border: none;
-    cursor: pointer; font-size: 1.4rem; color: var(--ink);
+  .sec-btn.active {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
   }
 
-  /* ── MAIN LAYOUT ── */
-  main { padding-top: 63px; }
-
-  /* ── SECTION PAGES ── */
-  .page { display: none; min-height: calc(100vh - 63px); }
-  .page.active { display: block; animation: fadeUp 0.5s ease; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
+  /* ── MAIN ── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem;
   }
 
-  /* ── HERO BAND ── */
-  .hero-band {
-    padding: 64px 28px 48px;
-    text-align: center;
+  .topic-panel { display: none; }
+  .topic-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  .section-panel { display: none; }
+  .section-panel.active { display: block; animation: slideIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── SUMMARY ── */
+  .summary-hero {
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    margin-bottom: 1.5rem;
     position: relative;
     overflow: hidden;
   }
-  .hero-band::before {
+  .summary-hero::before {
     content: '';
-    position: absolute; inset: 0;
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
     opacity: 0.06;
-    background-image: radial-gradient(circle at 20% 50%, var(--accent1) 0%, transparent 60%),
-                      radial-gradient(circle at 80% 30%, var(--accent2) 0%, transparent 60%);
   }
-  .hero-band .eyebrow {
-    font-size: 0.7rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 14px;
+  .t0 .summary-hero::before { background: var(--accent3); }
+  .t1 .summary-hero::before { background: var(--accent2); }
+  .t2 .summary-hero::before { background: var(--accent1); }
+
+  .summary-hero .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
   }
-  .hero-band h1 {
+  .summary-hero h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3.8rem);
-    font-weight: 900; line-height: 1.1;
-    letter-spacing: -1px; color: var(--ink);
-    margin-bottom: 18px;
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
   }
-  .hero-band p {
-    max-width: 560px; margin: 0 auto 32px;
-    color: var(--muted); font-size: 1.02rem; line-height: 1.65;
+  .summary-hero p {
+    opacity: 0.75;
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 560px;
   }
 
-  /* ── HOME CARDS ── */
-  .cards-grid {
+  .summary-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px; padding: 0 28px 64px;
-    max-width: 1100px; margin: 0 auto;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
   }
-  .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 32px 28px;
-    cursor: pointer;
-    transition: var(--transition);
-    border: 2px solid transparent;
-    position: relative; overflow: hidden;
-  }
-  .card::after {
-    content: '';
-    position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
-    background: var(--card-accent, var(--accent1));
-    transform: scaleX(0); transform-origin: left;
-    transition: transform 0.35s ease;
-  }
-  .card:hover { transform: translateY(-6px); box-shadow: 0 16px 48px rgba(0,0,0,0.12); }
-  .card:hover::after { transform: scaleX(1); }
-  .card-icon { font-size: 2.6rem; margin-bottom: 18px; }
-  .card h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.22rem; font-weight: 700; margin-bottom: 10px;
-  }
-  .card p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
-  .card-arrow {
-    display: inline-flex; align-items: center; gap: 6px;
-    margin-top: 20px; font-size: 0.82rem; font-weight: 600;
-    color: var(--card-accent, var(--accent1));
-  }
+  @media (max-width: 640px) { .summary-grid { grid-template-columns: 1fr; } }
 
-  /* ── CONTENT PAGES ── */
-  .content-wrap {
-    max-width: 820px; margin: 0 auto; padding: 0 24px 80px;
+  .summary-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border-left: 4px solid transparent;
   }
-  .section-hero {
-    padding: 52px 24px 40px;
+  .t0 .summary-card { border-left-color: var(--accent3); }
+  .t1 .summary-card { border-left-color: var(--accent2); }
+  .t2 .summary-card { border-left-color: var(--accent1); }
+  .summary-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .summary-card p {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+  .summary-card.full { grid-column: 1 / -1; }
+
+  .key-fact {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.9rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    border: 1px solid rgba(26,21,16,0.08);
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .key-fact::before { content: '→'; opacity: 0.5; flex-shrink: 0; }
+
+  /* ── FILL IN THE BLANK ── */
+  .fitb-passage {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    font-size: 1rem;
+    line-height: 2.2;
+    margin-bottom: 1.5rem;
+    border-top: 4px solid var(--gold);
+  }
+  .fitb-passage p { line-height: 2.4; }
+
+  .blank-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 4px;
+    gap: 2px;
+  }
+  .blank-input {
+    border: none;
+    border-bottom: 2.5px solid var(--ink-faint);
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
     text-align: center;
+    width: 110px;
+    padding: 2px 6px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    border-radius: 4px 4px 0 0;
   }
-  .section-hero .badge {
-    display: inline-block;
-    background: var(--section-color, var(--accent1));
-    color: #fff; border-radius: 30px;
-    padding: 5px 16px; font-size: 0.72rem; font-weight: 600;
-    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 18px;
-  }
-  .section-hero h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    font-weight: 900; margin-bottom: 14px; letter-spacing: -0.5px;
-  }
-  .section-hero .lead {
-    color: var(--muted); font-size: 1rem; line-height: 1.7;
-    max-width: 600px; margin: 0 auto;
-  }
+  .blank-input:focus { border-bottom-color: var(--ink); background: rgba(26,21,16,0.04); }
+  .blank-input.correct { border-bottom-color: var(--correct); background: rgba(45,106,79,0.08); color: var(--correct); }
+  .blank-input.wrong { border-bottom-color: var(--wrong); background: rgba(193,18,31,0.06); color: var(--wrong); }
 
-  /* ── INFO BLOCKS ── */
-  .info-block {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 32px; margin-bottom: 24px;
+  .hint-btn {
+    font-size: 0.65rem;
+    padding: 1px 7px;
+    border-radius: 99px;
+    border: 1px solid var(--ink-faint);
+    background: none;
+    color: var(--ink-faint);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
   }
-  .info-block h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.2rem; margin-bottom: 14px;
-    color: var(--section-color, var(--accent1));
+  .hint-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .hint-text {
+    font-size: 0.7rem;
+    color: var(--gold);
+    font-weight: 600;
+    display: none;
+    margin-top: 2px;
   }
-  .info-block p, .info-block li {
-    color: #374151; line-height: 1.75; font-size: 0.95rem;
-  }
-  .info-block ul { padding-left: 20px; margin-top: 10px; }
-  .info-block li { margin-bottom: 8px; }
+  .hint-text.visible { display: block; }
 
-  /* ── KEY TERMS ── */
-  .terms-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 14px; margin-top: 10px;
+  .fitb-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
   }
-  .term-pill {
-    background: var(--section-color, var(--accent1));
-    color: #fff; border-radius: 10px; padding: 12px 16px;
-  }
-  .term-pill strong { display: block; font-size: 0.85rem; margin-bottom: 4px; }
-  .term-pill span { font-size: 0.78rem; opacity: 0.88; line-height: 1.4; display: block; }
-
-  /* ── READ MORE ── */
-  .read-more-toggle {
-    display: flex; align-items: center; gap: 10px;
-    background: none; border: 2px solid var(--section-color, var(--accent1));
-    color: var(--section-color, var(--accent1));
-    border-radius: 30px; padding: 10px 22px;
-    font-size: 0.88rem; font-weight: 600; cursor: pointer;
-    transition: var(--transition); margin: 8px 0 0;
-  }
-  .read-more-toggle:hover {
-    background: var(--section-color, var(--accent1)); color: #fff;
-  }
-  .read-more-content {
-    display: none; margin-top: 18px;
-    padding-top: 18px; border-top: 1px solid #e5e7eb;
-  }
-  .read-more-content.open { display: block; animation: fadeUp 0.4s ease; }
-  .read-more-content p { color: #374151; line-height: 1.75; font-size: 0.95rem; margin-bottom: 12px; }
-
-  /* ── QUIZ ── */
-  .quiz-block {
+  .btn-primary {
+    padding: 0.7rem 1.8rem;
+    border-radius: 99px;
+    border: none;
     background: var(--ink);
-    border-radius: var(--radius); padding: 36px; margin-top: 32px;
-    color: #fff;
+    color: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 12px rgba(26,21,16,0.25);
   }
-  .quiz-block h3 {
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(26,21,16,0.3); }
+  .btn-secondary {
+    padding: 0.7rem 1.5rem;
+    border-radius: 99px;
+    border: 2px solid var(--ink-faint);
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+
+  .fitb-result {
+    margin-top: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    display: none;
+  }
+  .fitb-result.show { display: block; }
+  .fitb-result.good { background: rgba(45,106,79,0.1); color: var(--correct); }
+  .fitb-result.bad { background: rgba(193,18,31,0.08); color: var(--wrong); }
+
+  /* ── MCQ ── */
+  .mcq-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .mcq-counter {
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+  .mcq-score-badge {
+    background: var(--ink);
+    color: var(--bg);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 99px;
+  }
+
+  .question-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1rem;
+  }
+  .question-card .q-num {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 0.5rem;
+  }
+  .question-card .q-text {
     font-family: 'Playfair Display', serif;
-    font-size: 1.5rem; margin-bottom: 6px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1.25rem;
   }
-  .quiz-block .quiz-subtitle {
-    color: rgba(255,255,255,0.55); font-size: 0.85rem; margin-bottom: 28px;
+
+  .options { display: flex; flex-direction: column; gap: 0.6rem; }
+  .option-btn {
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--radius-sm);
+    border: 2px solid rgba(26,21,16,0.1);
+    background: var(--bg);
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
-  .quiz-q { margin-bottom: 30px; }
-  .quiz-q .q-text {
-    font-size: 0.98rem; font-weight: 500; margin-bottom: 14px; line-height: 1.5;
+  .option-btn:hover:not(:disabled) { border-color: var(--ink-soft); background: var(--surface2); }
+  .option-btn .opt-letter {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.2s;
   }
-  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
-  .quiz-option {
-    background: rgba(255,255,255,0.07);
-    border: 1.5px solid rgba(255,255,255,0.12);
-    color: #fff; border-radius: 10px; padding: 12px 18px;
-    font-size: 0.88rem; cursor: pointer; text-align: left;
-    transition: var(--transition);
-  }
-  .quiz-option:hover:not(:disabled) { background: rgba(255,255,255,0.14); }
-  .quiz-option.correct { background: #166534; border-color: #22c55e; }
-  .quiz-option.wrong   { background: #7f1d1d; border-color: #ef4444; }
-  .quiz-option:disabled { cursor: default; }
+  .option-btn.correct { border-color: var(--correct); background: rgba(45,106,79,0.08); }
+  .option-btn.correct .opt-letter { background: var(--correct); color: #fff; }
+  .option-btn.wrong { border-color: var(--wrong); background: rgba(193,18,31,0.06); }
+  .option-btn.wrong .opt-letter { background: var(--wrong); color: #fff; }
+  .option-btn:disabled { cursor: default; }
+
   .q-feedback {
-    font-size: 0.82rem; margin-top: 10px; padding: 8px 14px;
-    border-radius: 8px; display: none;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: none;
   }
   .q-feedback.show { display: block; }
-  .q-feedback.ok  { background: rgba(34,197,94,0.15); color: #4ade80; }
-  .q-feedback.bad { background: rgba(239,68,68,0.15);  color: #f87171; }
+  .q-feedback.correct-fb { background: rgba(45,106,79,0.1); color: var(--correct); }
+  .q-feedback.wrong-fb { background: rgba(193,18,31,0.08); color: var(--wrong); }
 
-  .quiz-submit-btn {
-    background: var(--section-color, var(--accent1));
-    color: #fff; border: none; border-radius: 30px;
-    padding: 13px 36px; font-size: 0.92rem; font-weight: 600;
-    cursor: pointer; transition: var(--transition); margin-top: 6px;
+  .mcq-nav {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-top: 1rem;
   }
-  .quiz-submit-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
-  .quiz-submit-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
-  .quiz-result {
-    display: none; margin-top: 22px;
-    background: rgba(255,255,255,0.06); border-radius: 14px; padding: 22px;
+
+  .result-screen {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    box-shadow: var(--shadow-lg);
     text-align: center;
   }
-  .quiz-result.show { display: block; animation: fadeUp 0.4s ease; }
-  .quiz-result .score-num {
+  .result-screen .score-big {
     font-family: 'Playfair Display', serif;
-    font-size: 3.5rem; font-weight: 900; line-height: 1;
+    font-size: 5rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.25rem;
   }
-  .quiz-result .score-label {
-    font-size: 0.85rem; color: rgba(255,255,255,0.55); margin-top: 4px;
+  .result-screen .score-big span { color: var(--gold); }
+  .result-screen .score-sub { color: var(--ink-faint); margin-bottom: 1rem; }
+  .result-screen .result-msg {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
   }
-  .quiz-result .result-msg {
-    margin-top: 14px; font-size: 0.95rem; color: rgba(255,255,255,0.8);
-  }
-  .quiz-retry {
-    background: rgba(255,255,255,0.12); color: #fff;
-    border: none; border-radius: 30px; padding: 10px 28px;
-    font-size: 0.85rem; font-weight: 600; cursor: pointer;
-    transition: var(--transition); margin-top: 16px;
-  }
-  .quiz-retry:hover { background: rgba(255,255,255,0.2); }
 
-  /* ── NAV BUTTONS ── */
-  .page-nav {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 28px 24px 52px;
-    max-width: 820px; margin: 0 auto;
+  /* ── MCQ GRID ── */
+  .mcq-dots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    justify-content: center;
   }
-  .page-nav-btn {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--card); border: none; border-radius: 30px;
-    padding: 12px 24px; font-size: 0.88rem; font-weight: 600;
-    color: var(--ink); cursor: pointer; box-shadow: var(--shadow);
-    transition: var(--transition);
+  .mcq-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid transparent;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+    cursor: pointer;
+    transition: all 0.2s;
   }
-  .page-nav-btn:hover { background: var(--ink); color: #fff; }
-  .page-nav-btn:disabled { opacity: 0.3; cursor: default; }
-  .page-nav-btn:disabled:hover { background: var(--card); color: var(--ink); }
+  .mcq-dot.answered-correct { background: var(--correct); color: #fff; }
+  .mcq-dot.answered-wrong { background: var(--wrong); color: #fff; }
+  .mcq-dot.current { border-color: var(--ink); color: var(--ink); }
 
-  /* ── STORY STYLING ── */
-  .story-card {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    color: #e2e8f0; border-radius: var(--radius);
-    padding: 36px; margin-bottom: 24px;
+  /* ── NAVIGATION FOOTER ── */
+  .nav-footer {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(26,21,16,0.08);
   }
-  .story-card p { line-height: 1.85; font-size: 0.96rem; margin-bottom: 16px; }
-  .story-card .chapter { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--accent5); font-weight: 600; margin-bottom: 18px; }
 
-  /* ── MOBILE NAV ── */
-  @media (max-width: 680px) {
-    .nav-links { display: none; flex-direction: column;
-      position: fixed; top: 63px; left: 0; right: 0;
-      background: var(--bg); border-bottom: 1px solid rgba(0,0,0,0.1);
-      padding: 16px 20px; gap: 4px; z-index: 850;
-    }
-    .nav-links.open { display: flex; }
-    .nav-toggle { display: block; }
-    .cards-grid { grid-template-columns: 1fr; }
-  }
 </style>
 </head>
 <body>
 
-<!-- Progress Bar -->
-<div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+<header>
+  <div class="logo">Reading<span>Hub</span></div>
+  <div class="progress-wrap"><div class="progress-fill" id="globalProgress" style="width:0%"></div></div>
+  <div class="progress-label" id="progressLabel">Topic 1 of 3</div>
+</header>
 
-<!-- Nav -->
-<nav>
-  <div class="nav-logo" onclick="goHome()">📚 EduReads</div>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="#" onclick="showPage('home')" data-page="home">Home</a></li>
-    <li><a href="#" onclick="showPage('dolphins')" data-page="dolphins">Dolphins</a></li>
-    <li><a href="#" onclick="showPage('stress')" data-page="stress">Stress</a></li>
-    <li><a href="#" onclick="showPage('digital')" data-page="digital">Digital</a></li>
-    <li><a href="#" onclick="showPage('walk')" data-page="walk">Walk Home</a></li>
-    <li><a href="#" onclick="showPage('mosquitoes')" data-page="mosquitoes">Mosquitoes</a></li>
-  </ul>
-  <button class="nav-toggle" id="navToggle" onclick="toggleNav()">☰</button>
+<nav class="topic-nav">
+  <button class="topic-btn active" data-topic="0" onclick="switchTopic(0)">
+    <span class="icon">🐬</span>Dolphins
+  </button>
+  <button class="topic-btn" data-topic="1" onclick="switchTopic(1)">
+    <span class="icon">🧠</span>Psychological Pressure
+  </button>
+  <button class="topic-btn" data-topic="2" onclick="switchTopic(2)">
+    <span class="icon">📱</span>Generation &amp; Technology
+  </button>
 </nav>
 
 <main>
 
-<!-- ════════════════════════════════════
-     HOME PAGE
-════════════════════════════════════ -->
-<div class="page active" id="page-home">
-  <div class="hero-band">
-    <p class="eyebrow">Interactive Learning</p>
-    <h1>Basic Education<br>Reading Series</h1>
-    <p>Explore five fascinating topics through clear summaries, key vocabulary, and interactive quizzes. Choose a section below to begin your journey.</p>
+<!-- ═══════════════════════════════════════════════
+     TOPIC 0 — DOLPHINS
+═══════════════════════════════════════════════ -->
+<div class="topic-panel t0 active" id="topic-0">
+  <div class="section-tabs">
+    <button class="sec-btn active" onclick="switchSection(0,0)">📖 Summary</button>
+    <button class="sec-btn" onclick="switchSection(0,1)">✏️ Fill in the Blank</button>
+    <button class="sec-btn" onclick="switchSection(0,2)">❓ Quiz (20 Qs)</button>
   </div>
-  <div class="cards-grid">
-    <div class="card" style="--card-accent:#2d6a4f" onclick="showPage('dolphins')">
-      <div class="card-icon">🐬</div>
-      <h3>Dolphins</h3>
-      <p>Discover the complex social lives of dolphins — their communication, intelligence, and remarkable community bonds.</p>
-      <span class="card-arrow" style="color:#2d6a4f">Start reading →</span>
+
+  <!-- SUMMARY -->
+  <div class="section-panel active" id="t0-s0">
+    <div class="summary-hero">
+      <div class="eyebrow">Reading 1</div>
+      <h1>Dolphins</h1>
+      <p>Exploring the intelligence, social behavior, and remarkable nature of one of the ocean's most fascinating creatures.</p>
     </div>
-    <div class="card" style="--card-accent:#e76f51" onclick="showPage('stress')">
-      <div class="card-icon">🧠</div>
-      <h3>Effects of Stress</h3>
-      <p>Learn how psychological pressure affects the body, emotions, and mental health — and what we can do about it.</p>
-      <span class="card-arrow" style="color:#e76f51">Start reading →</span>
-    </div>
-    <div class="card" style="--card-accent:#457b9d" onclick="showPage('digital')">
-      <div class="card-icon">📱</div>
-      <h3>Digital Habits Across Generations</h3>
-      <p>Compare how grandparents, parents, and teens use social media and smartphones differently.</p>
-      <span class="card-arrow" style="color:#457b9d">Start reading →</span>
-    </div>
-    <div class="card" style="--card-accent:#e63946" onclick="showPage('walk')">
-      <div class="card-icon">🚶</div>
-      <h3>A Long Walk Home</h3>
-      <p>A powerful short story about honesty, consequence, and the lessons a father teaches without speaking a word.</p>
-      <span class="card-arrow" style="color:#e63946">Start reading →</span>
-    </div>
-    <div class="card" style="--card-accent:#9b5de5" onclick="showPage('mosquitoes')">
-      <div class="card-icon">🦟</div>
-      <h3>Mosquitoes</h3>
-      <p>Uncover the biology, life cycle, and surprising behaviour of one of the world's most common — and annoying — insects.</p>
-      <span class="card-arrow" style="color:#9b5de5">Start reading →</span>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>🌊 Reputation & History</h3>
+        <p>Dolphins have long been considered the friendliest creatures in the sea. Stories of dolphins rescuing or helping drowning sailors have been told since Roman times, showing that this reputation goes back thousands of years.</p>
+      </div>
+      <div class="summary-card">
+        <h3>🤝 Complex Social Behavior</h3>
+        <p>The more scientists study dolphins, the more they discover how socially sophisticated these animals truly are. Dolphins look after sick members of their group, care for pregnant mothers, and protect the weakest individuals — behaviors very similar to what humans do in their own communities.</p>
+      </div>
+      <div class="summary-card">
+        <h3>💬 Communication</h3>
+        <p>Some scientists have proposed that dolphins possess their own language. However, most experts believe it is more accurate to say that dolphins communicate with one another without relying on words as we know them. Their communication system is complex but fundamentally different from human language.</p>
+      </div>
+      <div class="summary-card">
+        <h3>🧠 Intelligence</h3>
+        <p>The reading raises a bold and thought-provoking question: could dolphins be more intelligent than humans? The author challenges the common argument that humans are superior because we can kill dolphins more easily than they can kill us — pointing out that this is actually a very poor measure of intelligence or worth.</p>
+      </div>
+      <div class="summary-card full">
+        <h3>⚖️ The Author's Main Message</h3>
+        <p>The writer argues that the more we learn about dolphins, the less superior we appear when we choose to harm or destroy them. Killing a creature does not prove our superiority — if anything, it may demonstrate the opposite. The passage ultimately calls on readers to respect these remarkable mammals.</p>
+        <div class="key-fact">Dolphins are mammals, not fish — they breathe air, give birth to live young, and nurse their babies.</div>
+        <div class="key-fact">The author uses irony: the "proof" of human superiority (our ability to kill them) actually makes us look worse, not better.</div>
+        <div class="key-fact">Dolphins' social structures — caring for the sick, the elderly, and the unborn — mirror some of humanity's most valued traits.</div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- ════════════════════════════════════
-     DOLPHINS
-════════════════════════════════════ -->
-<div class="page" id="page-dolphins" style="--section-color:#2d6a4f">
-  <div class="section-hero">
-    <span class="badge">Section 1 of 5</span>
-    <h2>🐬 Dolphins</h2>
-    <p class="lead">One of the ocean's most intelligent and social creatures — dolphins have fascinated humans for thousands of years.</p>
+  <!-- FILL IN THE BLANK -->
+  <div class="section-panel" id="t0-s1">
+    <div class="fitb-passage">
+      <p id="fitb-t0-passage"></p>
+    </div>
+    <div class="fitb-controls">
+      <button class="btn-primary" onclick="checkFitb(0)">Check Answers</button>
+      <button class="btn-secondary" onclick="resetFitb(0)">Reset</button>
+    </div>
+    <div class="fitb-result" id="fitb-result-0"></div>
   </div>
-  <div class="content-wrap">
 
-    <div class="info-block">
-      <h3>Summary</h3>
-      <p>Dolphins have long been seen as friendly, helpful creatures. Ancient stories describe them rescuing drowning sailors. As scientists learn more, they discover that dolphin society is surprisingly complex — showing care, communication, and community in ways that resemble human behaviour.</p>
-    </div>
+  <!-- MCQ -->
+  <div class="section-panel" id="t0-s2">
+    <div id="mcq-0"></div>
+  </div>
 
-    <div class="info-block">
-      <h3>Social Behaviour</h3>
-      <p>Dolphins do not simply swim in groups — they form genuine communities. They look after sick members, support pregnant mothers, and protect weaker individuals. This level of care is similar to what we see in human families and is one reason scientists believe dolphins are highly intelligent mammals.</p>
-      <p style="margin-top:12px">Some researchers have proposed that dolphins have a language, though it is more accurate to say they communicate through sounds, movements, and signals rather than using words in the way humans do.</p>
-      <button class="read-more-toggle" onclick="toggleReadMore(this)">
-        <span>Read more</span> <span>▾</span>
-      </button>
-      <div class="read-more-content">
-        <p>The question of whether dolphins are more intelligent than humans is controversial. The most commonly cited argument for human superiority — that we can kill them more easily than they can kill us — is the weakest possible evidence of intelligence. In fact, the author of the passage argues the opposite: the more we learn about these animals, the more our actions against them reveal our own limitations rather than theirs.</p>
-        <p>Dolphins have been observed teaching their young, working cooperatively when hunting, and even grieving for lost members of their group — behaviours that were once thought to be uniquely human.</p>
-      </div>
-    </div>
-
-    <div class="info-block">
-      <h3>Key Terms</h3>
-      <div class="terms-grid">
-        <div class="term-pill"><strong>Mammal</strong><span>A warm-blooded animal that breathes air and nurses its young with milk.</span></div>
-        <div class="term-pill"><strong>Communication</strong><span>Sharing information using sounds, signals, or movement.</span></div>
-        <div class="term-pill"><strong>Social structure</strong><span>The organised relationships within a group or community.</span></div>
-        <div class="term-pill"><strong>Superiority</strong><span>The quality of being greater or more advanced than others.</span></div>
-      </div>
-    </div>
-
-    <!-- Quiz -->
-    <div class="quiz-block" id="quiz-dolphins">
-      <h3>Quiz – Dolphins</h3>
-      <p class="quiz-subtitle">Answer all questions, then submit to see your score.</p>
-      <div class="quiz-questions">
-
-        <div class="quiz-q" data-correct="2">
-          <p class="q-text">1. According to the text, what is the <em>weakest</em> argument for human superiority over dolphins?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">Humans have a more developed language system.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Humans build cities and technology.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Humans can kill dolphins more easily than dolphins can kill humans.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Humans live longer than dolphins.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="3">
-          <p class="q-text">2. How do dolphins communicate with one another?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">Through a written language similar to humans.</button>
-            <button class="quiz-option" onclick="selectOption(this)">They do not communicate at all.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Exclusively through body language.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Through sounds and signals, without needing words.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="0">
-          <p class="q-text">3. Which of the following best describes dolphin social behaviour?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">They care for sick members and protect the weakest in their group.</button>
-            <button class="quiz-option" onclick="selectOption(this)">They live alone and avoid contact with other dolphins.</button>
-            <button class="quiz-option" onclick="selectOption(this)">They only interact during mating season.</button>
-            <button class="quiz-option" onclick="selectOption(this)">They rely entirely on humans for protection.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-      </div>
-      <button class="quiz-submit-btn" onclick="submitQuiz('quiz-dolphins')" style="background:#2d6a4f">Submit Answers</button>
-      <div class="quiz-result">
-        <div class="score-num"></div>
-        <div class="score-label">correct answers</div>
-        <p class="result-msg"></p>
-        <button class="quiz-retry" onclick="retryQuiz('quiz-dolphins')">Try Again</button>
-      </div>
-    </div>
-
-    <div class="page-nav">
-      <button class="page-nav-btn" disabled>← Previous</button>
-      <button class="page-nav-btn" onclick="showPage('stress')">Next: Stress →</button>
-    </div>
+  <div class="nav-footer">
+    <button class="btn-secondary" onclick="prevTopic()" id="prev-0" style="visibility:hidden">← Previous Topic</button>
+    <button class="btn-primary" onclick="nextTopic()">Next Topic →</button>
   </div>
 </div>
 
-<!-- ════════════════════════════════════
-     STRESS
-════════════════════════════════════ -->
-<div class="page" id="page-stress" style="--section-color:#e76f51">
-  <div class="section-hero">
-    <span class="badge" style="background:#e76f51">Section 2 of 5</span>
-    <h2>🧠 The Effects of Stress</h2>
-    <p class="lead">Stress is more than just feeling overwhelmed — it has real, measurable effects on the body, emotions, and long-term mental health.</p>
+
+<!-- ═══════════════════════════════════════════════
+     TOPIC 1 — PSYCHOLOGICAL PRESSURE / STRESS
+═══════════════════════════════════════════════ -->
+<div class="topic-panel t1" id="topic-1">
+  <div class="section-tabs">
+    <button class="sec-btn active" onclick="switchSection(1,0)">📖 Summary</button>
+    <button class="sec-btn" onclick="switchSection(1,1)">✏️ Fill in the Blank</button>
+    <button class="sec-btn" onclick="switchSection(1,2)">❓ Quiz (20 Qs)</button>
   </div>
-  <div class="content-wrap">
 
-    <div class="info-block">
-      <h3>Summary</h3>
-      <p>The English expression "Stop the world, I want to get off!" captures the feeling of being overwhelmed by stress. Stress — defined as pressure or tension — is one of the most widespread causes of health problems in modern life. It affects us physically, emotionally, and mentally.</p>
+  <div class="section-panel active" id="t1-s0">
+    <div class="summary-hero">
+      <div class="eyebrow">Reading 2</div>
+      <h1>Psychological Pressure</h1>
+      <p>Understanding how stress affects the body, the emotions, and the mind — and why it is one of modern life's biggest health challenges.</p>
     </div>
-
-    <div class="info-block">
-      <h3>Physical Effects</h3>
-      <p>When the body is under stress, several systems are affected at once. The heart may beat faster, miss beats, or face increased blood pressure. The respiratory system can develop problems such as asthma or abnormally fast breathing, which depletes the body's carbon dioxide. The digestive system is also vulnerable — stress commonly causes stomach aches and disrupted digestion.</p>
-    </div>
-
-    <div class="info-block">
-      <h3>Emotional and Mental Effects</h3>
-      <p>Stress does not stay in the body — it quickly spills into emotions. People under stress often feel anxious, fatigued, or prone to sudden anger. A usually calm parent, for example, might shout at a child over something minor simply because workplace stress has eroded their patience.</p>
-      <p style="margin-top:12px">Over the long term, unmanaged stress can develop into serious mental health conditions, including depression, addiction (often as an attempt to escape the pressure), and eating disorders such as anorexia.</p>
-      <button class="read-more-toggle" onclick="toggleReadMore(this)">
-        <span>Read more</span> <span>▾</span>
-      </button>
-      <div class="read-more-content">
-        <p>Depression involves an intense, prolonged feeling of sadness and hopelessness that goes far beyond ordinary low moods. It is one of the most common outcomes of chronic stress. Alcoholism and other addictions frequently develop when a person uses substances to temporarily escape stressful feelings — but this only worsens the underlying problem over time.</p>
-        <p>The key message is prevention: recognising stress early and taking deliberate steps to reduce it — through rest, social support, or professional help — can protect both physical and mental wellbeing.</p>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>😤 What Is Stress?</h3>
+        <p>The reading opens with a well-known English expression — "Stop the world, I want to get off!" — which captures the feeling of panic and overwhelming pressure that stress creates. Stress is defined simply as pressure or tension. It is one of the most widespread causes of health problems in modern life, affecting people physically, emotionally, and mentally.</p>
+      </div>
+      <div class="summary-card">
+        <h3>❤️ Physical Effects</h3>
+        <p>Stress has a wide range of physical consequences. It can affect the heart by increasing the pulse rate, causing missed heartbeats, and raising blood pressure. It can impact the respiratory system, leading to asthma or abnormally fast breathing which reduces carbon dioxide. It also disrupts digestion, causing stomach aches and difficulty processing food properly.</p>
+      </div>
+      <div class="summary-card">
+        <h3>😟 Emotional Effects</h3>
+        <p>People under stress often feel anxious, tired, and irritable. They may experience panic attacks. Stress tends to make people overreact disproportionately to small, everyday problems. A parent who is normally calm and gentle might shout at a child over something trivial — like spilling juice — simply because the pressure of work has made them emotionally fragile.</p>
+      </div>
+      <div class="summary-card">
+        <h3>🏥 Long-term Mental Effects</h3>
+        <p>If stress continues over a long period without treatment, it can lead to serious mental illness. Depression — an extreme and prolonged feeling of sadness and hopelessness — can result from chronic stress. People may also turn to alcohol or drugs as a way of coping, leading to addiction. Eating disorders such as anorexia are sometimes caused by stress and are almost always made worse by it.</p>
+      </div>
+      <div class="summary-card full">
+        <h3>💡 The Author's Conclusion</h3>
+        <p>The writer concludes by summarizing the three-layered danger of stress: it attacks the body, disrupts the emotions, and — if left untreated — eventually threatens mental health. The final advice is clear and even a little playful: reduce stress by "stopping the world" and resting for a while. The message is that managing stress is not a luxury — it is essential for overall well-being.</p>
+        <div class="key-fact">Stress affects the heart, lungs, and stomach — three of the body's most vital systems.</div>
+        <div class="key-fact">Alcoholism and eating disorders like anorexia can both be results of long-term unmanaged stress.</div>
+        <div class="key-fact">The article title "Stop the world, I want to get off!" is a metaphor for feeling overwhelmed by life's pace.</div>
       </div>
     </div>
+  </div>
 
-    <div class="info-block">
-      <h3>Key Terms</h3>
-      <div class="terms-grid">
-        <div class="term-pill" style="background:#e76f51"><strong>Stress</strong><span>Pressure or tension that affects the body and mind.</span></div>
-        <div class="term-pill" style="background:#e76f51"><strong>Anxiety</strong><span>A feeling of worry, nervousness, or unease.</span></div>
-        <div class="term-pill" style="background:#e76f51"><strong>Depression</strong><span>A serious mental illness involving deep sadness and hopelessness.</span></div>
-        <div class="term-pill" style="background:#e76f51"><strong>Addiction</strong><span>An unhealthy dependence on a substance or behaviour.</span></div>
-      </div>
+  <div class="section-panel" id="t1-s1">
+    <div class="fitb-passage">
+      <p id="fitb-t1-passage"></p>
     </div>
-
-    <div class="quiz-block" id="quiz-stress">
-      <h3>Quiz – Stress</h3>
-      <p class="quiz-subtitle">Test your understanding of the effects of stress.</p>
-      <div class="quiz-questions">
-
-        <div class="quiz-q" data-correct="1">
-          <p class="q-text">1. Which of the following is NOT listed as a common problem caused by stress?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">Physical problems</button>
-            <button class="quiz-option" onclick="selectOption(this)">Anecdotal problems</button>
-            <button class="quiz-option" onclick="selectOption(this)">Mental problems</button>
-            <button class="quiz-option" onclick="selectOption(this)">Emotional problems</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="0">
-          <p class="q-text">2. How does stress lead to alcoholism?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">People use alcohol to try to relieve the stress they feel.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Alcohol is a natural cure for stress.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Stressed people are forced to drink alcohol.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Alcohol increases stress hormones in the body.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="3">
-          <p class="q-text">3. Which physical system can stress affect by causing asthma or breathing too fast?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">The digestive system</button>
-            <button class="quiz-option" onclick="selectOption(this)">The nervous system</button>
-            <button class="quiz-option" onclick="selectOption(this)">The skeletal system</button>
-            <button class="quiz-option" onclick="selectOption(this)">The respiratory system</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-      </div>
-      <button class="quiz-submit-btn" onclick="submitQuiz('quiz-stress')" style="background:#e76f51">Submit Answers</button>
-      <div class="quiz-result">
-        <div class="score-num"></div>
-        <div class="score-label">correct answers</div>
-        <p class="result-msg"></p>
-        <button class="quiz-retry" onclick="retryQuiz('quiz-stress')">Try Again</button>
-      </div>
+    <div class="fitb-controls">
+      <button class="btn-primary" onclick="checkFitb(1)">Check Answers</button>
+      <button class="btn-secondary" onclick="resetFitb(1)">Reset</button>
     </div>
+    <div class="fitb-result" id="fitb-result-1"></div>
+  </div>
 
-    <div class="page-nav">
-      <button class="page-nav-btn" onclick="showPage('dolphins')">← Dolphins</button>
-      <button class="page-nav-btn" onclick="showPage('digital')">Next: Digital →</button>
-    </div>
+  <div class="section-panel" id="t1-s2">
+    <div id="mcq-1"></div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn-secondary" onclick="prevTopic()">← Previous Topic</button>
+    <button class="btn-primary" onclick="nextTopic()">Next Topic →</button>
   </div>
 </div>
 
-<!-- ════════════════════════════════════
-     DIGITAL
-════════════════════════════════════ -->
-<div class="page" id="page-digital" style="--section-color:#457b9d">
-  <div class="section-hero">
-    <span class="badge" style="background:#457b9d">Section 3 of 5</span>
-    <h2>📱 Digital Habits Across Generations</h2>
-    <p class="lead">From grandparents joining Facebook to teenagers sleeping beside their phones — how different generations interact with technology tells us a great deal about modern life.</p>
+
+<!-- ═══════════════════════════════════════════════
+     TOPIC 2 — GENERATION & TECHNOLOGY
+═══════════════════════════════════════════════ -->
+<div class="topic-panel t2" id="topic-2">
+  <div class="section-tabs">
+    <button class="sec-btn active" onclick="switchSection(2,0)">📖 Summary</button>
+    <button class="sec-btn" onclick="switchSection(2,1)">✏️ Fill in the Blank</button>
+    <button class="sec-btn" onclick="switchSection(2,2)">❓ Quiz (20 Qs)</button>
   </div>
-  <div class="content-wrap">
 
-    <div class="info-block">
-      <h3>Summary</h3>
-      <p>Today's older adults are adopting social media in growing numbers, while younger teenagers are quietly moving away from platforms like Facebook. But all generations remain closely attached to their smartphones — in very different ways and for very different reasons.</p>
+  <div class="section-panel active" id="t2-s0">
+    <div class="summary-hero">
+      <div class="eyebrow">Reading 3</div>
+      <h1>Generation &amp; Technology</h1>
+      <p>How different generations use social media and smartphones — and what happens when digital habits reshape real-life relationships.</p>
     </div>
-
-    <div class="info-block">
-      <h3>The Older Generation</h3>
-      <p>In the United Kingdom, adults over 55 are joining Facebook in increasing numbers, making them one of the platform's largest user groups. For many, the motivation is staying connected with family — especially grandchildren. Sheila, aged 59, describes Facebook as far superior to waiting for letters or photographs to arrive in the post. It allows her to feel genuinely present in her grandchildren's lives. Ironically, the grandchildren themselves are leaving Facebook behind.</p>
-    </div>
-
-    <div class="info-block">
-      <h3>Teenagers and Smartphones</h3>
-      <p>Young people under 17 are spending less time on Facebook but remain deeply attached to their phones. Fifteen-year-old Chloe keeps her phone beside her at night, checks it before sleeping, and picks it up the moment she wakes. Researchers note that this constant phone use is reducing the time teenagers spend with friends in the real world — a significant social cost.</p>
-      <button class="read-more-toggle" onclick="toggleReadMore(this)">
-        <span>Read more</span> <span>▾</span>
-      </button>
-      <div class="read-more-content">
-        <p>Peter, a 38-year-old father, represents the middle generation — those who were early adopters of smartphones. He admits he was once constantly connected, feeling as though he was always working. Realising that he could not tell his children to reduce screen time while he himself was permanently on his phone, he made a change: in the evenings and at weekends he removes his SIM card and uses a basic mobile phone that only makes calls and sends texts. He retains connection for emergencies but sets a healthier example for his children.</p>
-        <p>The article ends with a question worth sitting with: will the trend toward a less digital life eventually spread across all generations?</p>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>👴 Grandparents Online</h3>
+        <p>Surprisingly, it is the older generation — those aged 55 and above — who are joining social media platforms like Facebook in rapidly growing numbers. In the UK, there are 3.5 million Facebook users aged 55–64 and 2.9 million over the age of 65. Sheila, aged 59, explains that she joined to watch videos and photos of her grandchildren shared by her daughter — a much richer connection than the old days of waiting for letters and photos by post.</p>
       </div>
-    </div>
-
-    <div class="info-block">
-      <h3>Key Terms</h3>
-      <div class="terms-grid">
-        <div class="term-pill" style="background:#457b9d"><strong>Social media</strong><span>Platforms like Facebook, Instagram, and Twitter for sharing content online.</span></div>
-        <div class="term-pill" style="background:#457b9d"><strong>Early adopters</strong><span>People who start using new technology before most others do.</span></div>
-        <div class="term-pill" style="background:#457b9d"><strong>Addiction</strong><span>An unhealthy reliance on something — in this case, digital devices.</span></div>
-        <div class="term-pill" style="background:#457b9d"><strong>Ironically</strong><span>In an unexpected, sometimes amusing way — the opposite of what you'd expect.</span></div>
+      <div class="summary-card">
+        <h3>👶 Teenagers Leaving Facebook</h3>
+        <p>Ironically, while grandparents are joining Facebook, teenagers are leaving it. Only 2.2 million UK users are under 17. However, young people are not disconnecting from technology — they are simply moving to other apps and devices. Fifteen-year-old Chloe even sleeps with her phone, using it as her alarm clock, and checks it the moment she wakes up and just before she falls asleep.</p>
       </div>
-    </div>
-
-    <div class="quiz-block" id="quiz-digital">
-      <h3>Quiz – Digital Habits</h3>
-      <p class="quiz-subtitle">How well did you read between the screens?</p>
-      <div class="quiz-questions">
-
-        <div class="quiz-q" data-correct="0">
-          <p class="q-text">1. Why is it ironic that grandparents are joining Facebook in large numbers?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">Their grandchildren — who the platform was made for — are actually leaving it.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Older people are usually more skilled with technology.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Facebook was originally built for senior citizens.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Grandparents are less interested in family news.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="2">
-          <p class="q-text">2. Why did Peter decide to stop using his smartphone in the evenings?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">He could not afford the monthly data plan.</button>
-            <button class="quiz-option" onclick="selectOption(this)">His employer required him to switch off after work.</button>
-            <button class="quiz-option" onclick="selectOption(this)">He felt he couldn't ask his children to use phones less if he was constantly on his own.</button>
-            <button class="quiz-option" onclick="selectOption(this)">He lost interest in social media entirely.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="1">
-          <p class="q-text">3. What negative effect does heavy smartphone use have on teenagers, according to the text?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">It causes them to fail their school exams.</button>
-            <button class="quiz-option" onclick="selectOption(this)">They miss out on spending time with friends in the real world.</button>
-            <button class="quiz-option" onclick="selectOption(this)">It makes them less interested in outdoor activities.</button>
-            <button class="quiz-option" onclick="selectOption(this)">They develop poor posture from looking down at screens.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
+      <div class="summary-card">
+        <h3>🤝 Real Life vs. Screen Life</h3>
+        <p>The contrast between generations is striking. Teenagers are spending so much time on their phones at home that they are missing out on face-to-face time with friends. Meanwhile, Sheila has reconnected with old school friends she had not spoken to in forty years, using Facebook to organize in-person meetings across the country. For her, social media has entirely transformed her social life for the better.</p>
       </div>
-      <button class="quiz-submit-btn" onclick="submitQuiz('quiz-digital')" style="background:#457b9d">Submit Answers</button>
-      <div class="quiz-result">
-        <div class="score-num"></div>
-        <div class="score-label">correct answers</div>
-        <p class="result-msg"></p>
-        <button class="quiz-retry" onclick="retryQuiz('quiz-digital')">Try Again</button>
+      <div class="summary-card">
+        <h3>👨‍👧 Parents: The Early Adopters</h3>
+        <p>Peter, a 38-year-old father of two teenagers, represents the "middle generation" — the early adopters of smartphones who paved the way for their children's addiction. He admits he used to be constantly connected, always feeling like he was working. Concerned about setting a poor example, he now removes his SIM card on evenings and weekends, putting it into an old basic phone that can only call and send texts.</p>
       </div>
-    </div>
-
-    <div class="page-nav">
-      <button class="page-nav-btn" onclick="showPage('stress')">← Stress</button>
-      <button class="page-nav-btn" onclick="showPage('walk')">Next: Walk Home →</button>
+      <div class="summary-card full">
+        <h3>🔮 The Bigger Question</h3>
+        <p>The article ends with a thought-provoking question: will the generation above and below Peter — grandparents and teenagers — eventually follow his lead toward a less digital lifestyle? The piece challenges all readers to think about whether technology is genuinely enriching their relationships or quietly replacing them.</p>
+        <div class="key-fact">The over-55s will soon be Facebook's second biggest user group in the UK.</div>
+        <div class="key-fact">"Ironically" is a key word — grandparents use the platform their grandchildren have abandoned.</div>
+        <div class="key-fact">Peter's strategy: keeping one basic phone for emergencies shows it is possible to reduce screen time without being completely disconnected.</div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- ════════════════════════════════════
-     WALK HOME
-════════════════════════════════════ -->
-<div class="page" id="page-walk" style="--section-color:#e63946">
-  <div class="section-hero">
-    <span class="badge" style="background:#e63946">Section 4 of 5</span>
-    <h2>🚶 A Long Walk Home</h2>
-    <p class="lead">A story about a teenage lie, a father's silent response, and the most unforgettable lesson either of them ever shared.</p>
+  <div class="section-panel" id="t2-s1">
+    <div class="fitb-passage">
+      <p id="fitb-t2-passage"></p>
+    </div>
+    <div class="fitb-controls">
+      <button class="btn-primary" onclick="checkFitb(2)">Check Answers</button>
+      <button class="btn-secondary" onclick="resetFitb(2)">Reset</button>
+    </div>
+    <div class="fitb-result" id="fitb-result-2"></div>
   </div>
-  <div class="content-wrap">
 
-    <div class="info-block">
-      <h3>Summary</h3>
-      <p>Sixteen-year-old Jason is given the privilege of driving his father to a distant village. He promises to collect him at 4pm, but instead spends hours at the cinema and returns two hours late. He invents a lie about the car needing repairs — but his father has already called the garage and knows the truth. What follows is one of the most powerful lessons of Jason's life.</p>
-    </div>
-
-    <div class="story-card">
-      <p class="chapter">The Story — Retold in Simple Language</p>
-      <p>Jason's father trusted him with the car — a rare privilege for a new driver. When Jason lost track of time at the cinema, his first instinct was to hide the truth. He invented a story about mechanical repairs. But the moment he met his father's eyes, something felt wrong.</p>
-      <p>His father told him quietly: "I'm disappointed that you felt you had to lie to me." He had already called the garage. He already knew everything. Rather than shouting, he said something more painful — that if his son felt the need to lie to him, it meant he had failed as a father. Then he turned and began to walk the 18 miles home.</p>
-      <p>Jason followed slowly behind in the car, pleading, apologising, watching his father walk alone through the dark. For every one of those 18 miles, Jason felt the full weight of what he had done. He never lied to his father again.</p>
-    </div>
-
-    <div class="info-block">
-      <h3>Themes and Lessons</h3>
-      <p>The story explores honesty, trust, and parental love. Jason's father does not punish through anger — he punishes through painful, silent action. His walk is a statement: a father who has been let down does not rage; he reflects and endures. The lesson lands far deeper than any reprimand could have.</p>
-      <button class="read-more-toggle" onclick="toggleReadMore(this)" style="border-color:#e63946;color:#e63946">
-        <span>Read more</span> <span>▾</span>
-      </button>
-      <div class="read-more-content">
-        <p>The father's choice to walk instead of riding home also carries an element of self-examination. He says he is "angry with himself," not with Jason — because he believes a parent is responsible for the character of the child they raise. This reflects a deep and mature understanding of the parent-child relationship.</p>
-        <p>From a language learning perspective, the story introduces past perfect tense beautifully — "he had called," "I had gone," "we had planned." These constructions help show the sequence of events when two things happen in the past, with one completing before the other began.</p>
-      </div>
-    </div>
-
-    <div class="info-block">
-      <h3>Key Terms</h3>
-      <div class="terms-grid">
-        <div class="term-pill" style="background:#e63946"><strong>Remote</strong><span>Far away from other places; difficult to reach.</span></div>
-        <div class="term-pill" style="background:#e63946"><strong>Immersed</strong><span>Deeply absorbed or involved in something.</span></div>
-        <div class="term-pill" style="background:#e63946"><strong>Confess</strong><span>To admit the truth about something you did wrong.</span></div>
-        <div class="term-pill" style="background:#e63946"><strong>Contemplate</strong><span>To think deeply and seriously about something.</span></div>
-        <div class="term-pill" style="background:#e63946"><strong>Relent</strong><span>To give up a firm decision and agree to something.</span></div>
-      </div>
-    </div>
-
-    <div class="quiz-block" id="quiz-walk">
-      <h3>Quiz – A Long Walk Home</h3>
-      <p class="quiz-subtitle">How carefully did you follow Jason's journey?</p>
-      <div class="quiz-questions">
-
-        <div class="quiz-q" data-correct="1">
-          <p class="q-text">1. Why was Jason's father already aware that Jason was lying?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">He saw Jason entering the cinema earlier that day.</button>
-            <button class="quiz-option" onclick="selectOption(this)">He had telephoned the garage and was told the car had not been picked up yet.</button>
-            <button class="quiz-option" onclick="selectOption(this)">A neighbour told him what Jason had been doing.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Jason's expression gave away the lie immediately.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="2">
-          <p class="q-text">2. Why did Jason's father say he was "angry with himself" rather than with Jason?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">He felt responsible for making Jason late in the first place.</button>
-            <button class="quiz-option" onclick="selectOption(this)">He was embarrassed to have been waiting so long in public.</button>
-            <button class="quiz-option" onclick="selectOption(this)">He believed that if his son lied to him, it was because he had failed as a parent.</button>
-            <button class="quiz-option" onclick="selectOption(this)">He thought he had given Jason too much freedom with the car.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="3">
-          <p class="q-text">3. What was the most important lesson Jason took from this experience?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">To always keep his phone charged when driving.</button>
-            <button class="quiz-option" onclick="selectOption(this)">To watch fewer movies during the day.</button>
-            <button class="quiz-option" onclick="selectOption(this)">To check the car before making long trips.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Never to lie to his father again.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-      </div>
-      <button class="quiz-submit-btn" onclick="submitQuiz('quiz-walk')" style="background:#e63946">Submit Answers</button>
-      <div class="quiz-result">
-        <div class="score-num"></div>
-        <div class="score-label">correct answers</div>
-        <p class="result-msg"></p>
-        <button class="quiz-retry" onclick="retryQuiz('quiz-walk')">Try Again</button>
-      </div>
-    </div>
-
-    <div class="page-nav">
-      <button class="page-nav-btn" onclick="showPage('digital')">← Digital</button>
-      <button class="page-nav-btn" onclick="showPage('mosquitoes')">Next: Mosquitoes →</button>
-    </div>
+  <div class="section-panel" id="t2-s2">
+    <div id="mcq-2"></div>
   </div>
-</div>
 
-<!-- ════════════════════════════════════
-     MOSQUITOES
-════════════════════════════════════ -->
-<div class="page" id="page-mosquitoes" style="--section-color:#9b5de5">
-  <div class="section-hero">
-    <span class="badge" style="background:#9b5de5">Section 5 of 5</span>
-    <h2>🦟 Mosquitoes</h2>
-    <p class="lead">Tiny, persistent, and surprisingly sophisticated — mosquitoes are among the most studied insects on the planet. Here's why.</p>
-  </div>
-  <div class="content-wrap">
-
-    <div class="info-block">
-      <h3>Summary</h3>
-      <p>There are roughly 3,500 species of mosquitoes worldwide. The word "mosquito" comes from Portuguese and means "little fly." Despite their small size, mosquitoes are difficult to swat because of specialised wing scales that reduce friction and allow them to move quickly and efficiently through the air. Their wings beat approximately 600 times per second, producing the familiar buzzing sound.</p>
-    </div>
-
-    <div class="info-block">
-      <h3>The Life Cycle</h3>
-      <p>Mosquitoes pass through four distinct stages: egg, larva, pupa, and adult. All of these stages depend heavily on water. Eggs are laid in or near water — some species prefer still water in containers, others prefer marshes or swamps. Once hatched, larvae (called "wigglers" for their jerky movements) feed beneath the water's surface but must rise regularly for air. After shedding their skin four times, they become pupae, which also breathe air and continue feeding. Adult mosquitoes emerge after 10–14 days in most species, though warmer temperatures can shorten this significantly.</p>
-      <button class="read-more-toggle" onclick="toggleReadMore(this)" style="border-color:#9b5de5;color:#9b5de5">
-        <span>Read more</span> <span>▾</span>
-      </button>
-      <div class="read-more-content">
-        <p>Once adult mosquitoes emerge, they mate within a few days. Both males and females feed on nectar and sugar sources. However, only females bite humans and animals — they require a blood meal to develop their eggs. After feeding, a female rests for two to three days before laying her eggs, and this cycle continues for roughly one to two weeks, which is the full adult lifespan of a mosquito.</p>
-        <p>Controlling mosquito populations therefore means targeting their breeding grounds — particularly any standing water. Removing old tyres, emptying buckets, and clearing blocked drains can significantly reduce local mosquito numbers.</p>
-      </div>
-    </div>
-
-    <div class="info-block">
-      <h3>How Do They Find You?</h3>
-      <p>Mosquitoes are attracted by warmth, movement, and carbon dioxide — all of which humans produce constantly. When you laugh, talk, or breathe, you release carbon dioxide that draws mosquitoes toward you. So the social activities of conversation and laughter are, ironically, exactly what attracts them — not your personality, but your biology.</p>
-    </div>
-
-    <div class="info-block">
-      <h3>Key Terms</h3>
-      <div class="terms-grid">
-        <div class="term-pill" style="background:#9b5de5"><strong>Larva</strong><span>The second life stage of a mosquito — an immature, worm-like form.</span></div>
-        <div class="term-pill" style="background:#9b5de5"><strong>Pupa</strong><span>The third stage, between larva and adult, where transformation occurs.</span></div>
-        <div class="term-pill" style="background:#9b5de5"><strong>Friction</strong><span>Resistance when two surfaces move against each other.</span></div>
-        <div class="term-pill" style="background:#9b5de5"><strong>Organic</strong><span>Derived from living things — such as leaves, grass, and soil.</span></div>
-        <div class="term-pill" style="background:#9b5de5"><strong>Maturity</strong><span>The state of being fully developed — adulthood.</span></div>
-      </div>
-    </div>
-
-    <div class="quiz-block" id="quiz-mosquitoes">
-      <h3>Quiz – Mosquitoes</h3>
-      <p class="quiz-subtitle">Let's see how much you absorbed about these tiny creatures.</p>
-      <div class="quiz-questions">
-
-        <div class="quiz-q" data-correct="3">
-          <p class="q-text">1. Why do mosquito wings have scales?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">To help them float on the surface of water.</button>
-            <button class="quiz-option" onclick="selectOption(this)">To make them more visible to their mates.</button>
-            <button class="quiz-option" onclick="selectOption(this)">To protect them from predators.</button>
-            <button class="quiz-option" onclick="selectOption(this)">To reduce friction and help them move quickly and efficiently through the air.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="0">
-          <p class="q-text">2. Why do only female mosquitoes bite humans?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">They need blood to develop their eggs.</button>
-            <button class="quiz-option" onclick="selectOption(this)">They need blood to survive the winter.</button>
-            <button class="quiz-option" onclick="selectOption(this)">They are more aggressive than males.</button>
-            <button class="quiz-option" onclick="selectOption(this)">They use blood as a form of navigation.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="2">
-          <p class="q-text">3. What is the correct order of a mosquito's life cycle?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">Larva → Egg → Pupa → Adult</button>
-            <button class="quiz-option" onclick="selectOption(this)">Pupa → Larva → Egg → Adult</button>
-            <button class="quiz-option" onclick="selectOption(this)">Egg → Larva → Pupa → Adult</button>
-            <button class="quiz-option" onclick="selectOption(this)">Adult → Pupa → Egg → Larva</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-        <div class="quiz-q" data-correct="1">
-          <p class="q-text">4. What primarily attracts mosquitoes to humans?</p>
-          <div class="quiz-options">
-            <button class="quiz-option" onclick="selectOption(this)">Bright clothing and jewellery.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Warmth, movement, and exhaled carbon dioxide.</button>
-            <button class="quiz-option" onclick="selectOption(this)">The sound of human voices.</button>
-            <button class="quiz-option" onclick="selectOption(this)">Human sweat and salt.</button>
-          </div>
-          <div class="q-feedback"></div>
-        </div>
-
-      </div>
-      <button class="quiz-submit-btn" onclick="submitQuiz('quiz-mosquitoes')" style="background:#9b5de5">Submit Answers</button>
-      <div class="quiz-result">
-        <div class="score-num"></div>
-        <div class="score-label">correct answers</div>
-        <p class="result-msg"></p>
-        <button class="quiz-retry" onclick="retryQuiz('quiz-mosquitoes')">Try Again</button>
-      </div>
-    </div>
-
-    <div class="page-nav">
-      <button class="page-nav-btn" onclick="showPage('walk')">← Walk Home</button>
-      <button class="page-nav-btn" onclick="goHome()">🏠 Back to Home</button>
-    </div>
+  <div class="nav-footer">
+    <button class="btn-secondary" onclick="prevTopic()">← Previous Topic</button>
+    <button class="btn-secondary" onclick="prevTopic()" id="next-2" style="visibility:hidden">Next Topic →</button>
   </div>
 </div>
 
 </main>
 
 <script>
-// ── PAGE ORDER & PROGRESS ──
-const PAGE_ORDER = ['home','dolphins','stress','digital','walk','mosquitoes'];
+// ════════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════════
 
-function updateProgress(pageId) {
-  const idx = PAGE_ORDER.indexOf(pageId);
-  const pct = idx <= 0 ? 0 : Math.round((idx / (PAGE_ORDER.length - 1)) * 100);
-  document.getElementById('progress-bar').style.width = pct + '%';
-}
+const FITB_DATA = [
+  // TOPIC 0 — DOLPHINS
+  {
+    segments: [
+      "Dolphins are regarded as the ",
+      { word: "friendliest", hint: "Starts with 'fr' — means most kind and welcoming (9 letters)" },
+      " creatures in the sea and stories of them helping ",
+      { word: "drowning", hint: "What happens when someone sinks in water (8 letters)" },
+      " sailors have been common since Roman times. The more we learn about dolphins, the more we realize that their ",
+      { word: "society", hint: "Another word for community or social group (7 letters)" },
+      " is more complex than people previously imagined. They look after other dolphins when they are ill, care for ",
+      { word: "pregnant", hint: "Describes a mother expecting a baby (8 letters)" },
+      " mothers and protect the ",
+      { word: "weakest", hint: "The opposite of strongest (7 letters)" },
+      " in the community, as we do. Some scientists have suggested that dolphins have a ",
+      { word: "language", hint: "A system of communication using words or sounds (8 letters)" },
+      " but it is much more probable that they ",
+      { word: "communicate", hint: "To share information with others (11 letters)" },
+      " with each other without needing words. On the contrary, the more we discover about these remarkable creatures, the less we appear ",
+      { word: "superior", hint: "Means better than others (8 letters)" },
+      " when we destroy them."
+    ]
+  },
+  // TOPIC 1 — STRESS
+  {
+    segments: [
+      "Too much stress results in physical, ",
+      { word: "emotional", hint: "Related to your feelings (9 letters)" },
+      ", and mental health problems. Stress can affect the heart. It can increase the ",
+      { word: "pulse", hint: "Your heartbeat rate (5 letters)" },
+      " rate, make the heart miss beats, and can cause high ",
+      { word: "blood pressure", hint: "A condition linked to heart health — two words" },
+      ". Stress can lead to ",
+      { word: "asthma", hint: "A breathing condition — starts with 'a' (6 letters)" },
+      ". It can cause a person to breathe too fast, resulting in a loss of important ",
+      { word: "carbon dioxide", hint: "A gas exhaled by humans — two words" },
+      ". People suffering from stress often feel ",
+      { word: "anxious", hint: "Feeling worried or nervous (7 letters)" },
+      ". Long-term stress can lead to ",
+      { word: "depression", hint: "An extreme and prolonged feeling of sadness (10 letters)" },
+      ", an extreme feeling of sadness and hopelessness. Eating disorders, such as ",
+      { word: "anorexia", hint: "A serious eating disorder starting with 'a' (8 letters)" },
+      ", are sometimes caused by stress."
+    ]
+  },
+  // TOPIC 2 — DIGITAL HABITS
+  {
+    segments: [
+      "Today's grandparents are joining their grandchildren on ",
+      { word: "social media", hint: "Platforms like Facebook and Instagram — two words" },
+      ", but the different generations' online habits couldn't be more different. In the UK the over-55s are joining Facebook in increasing ",
+      { word: "numbers", hint: "Another word for amounts or figures (7 letters)" },
+      ". Children under 17 in the UK are ",
+      { word: "leaving", hint: "The opposite of joining (7 letters)" },
+      " the site, but they're not going far from their ",
+      { word: "smartphones", hint: "Touch-screen mobile devices (11 letters)" },
+      ". Chloe's age group is spending so much time on their phones at home that they are missing out on spending time with their friends in ",
+      { word: "real life", hint: "The opposite of virtual life — two words" },
+      ". Teenagers might have their parents to thank for their smartphone and social media ",
+      { word: "addiction", hint: "An unhealthy dependency on something (9 letters)" },
+      " as their parents were the early ",
+      { word: "adopters", hint: "People who use something new first (8 letters)" },
+      " of the smartphone. Peter takes his SIM card out so that he is setting a better ",
+      { word: "example", hint: "A model of behavior for others to follow (7 letters)" },
+      " to his kids."
+    ]
+  }
+];
 
-function updateNavActive(pageId) {
-  document.querySelectorAll('.nav-links a').forEach(a => {
-    a.classList.toggle('active', a.dataset.page === pageId);
+const MCQ_DATA = [
+  // ── TOPIC 0: DOLPHINS ── 20 questions
+  [
+    { q: "According to the passage, dolphins are regarded as the _____ creatures in the sea.", opts: ["most dangerous","friendliest","largest","fastest"], ans: 1 },
+    { q: "Stories of dolphins helping drowning sailors have been common since _____ times.", opts: ["Medieval","Modern","Greek","Roman"], ans: 3 },
+    { q: "What does the passage say about dolphins' society?", opts: ["It is simple and primitive","It is more complex than previously imagined","It is exactly like human society","It is mysterious and unknown"], ans: 1 },
+    { q: "Dolphins look after other dolphins when they are _____.", opts: ["hungry","lost","ill","young"], ans: 2 },
+    { q: "According to the passage, dolphins protect the _____ in the community.", opts: ["oldest","largest","weakest","smartest"], ans: 2 },
+    { q: "Some scientists have suggested that dolphins _____ .", opts: ["are not intelligent","have a language","cannot communicate","are unfriendly"], ans: 1 },
+    { q: "The author finds it MORE probable that dolphins communicate _____ .", opts: ["using words similar to humans","without needing words","through visual signals only","by touching each other"], ans: 1 },
+    { q: "The most common argument for human superiority over dolphins is that humans _____ .", opts: ["are smarter","live longer","can kill dolphins more easily","have language"], ans: 2 },
+    { q: "The author considers the argument about killing dolphins to be _____ .", opts: ["very convincing","scientifically proven","the least satisfactory","morally acceptable"], ans: 2 },
+    { q: "What happens the more we discover about dolphins, according to the author?", opts: ["We feel more superior","We feel less superior when we destroy them","We feel equal to them","We become more afraid of them"], ans: 1 },
+    { q: "The word 'remarkable' in the passage is closest in meaning to _____.", opts: ["ordinary","extraordinary","dangerous","friendly"], ans: 1 },
+    { q: "Which of the following behaviors do dolphins and humans share according to the passage?", opts: ["Using language","Building homes","Protecting the weakest","Swimming together"], ans: 2 },
+    { q: "The passage suggests that dolphins are _____.", opts: ["less intelligent than fish","possibly more intelligent than humans","exactly as intelligent as humans","not intelligent at all"], ans: 1 },
+    { q: "Which statement is TRUE according to the passage?", opts: ["Dolphins have been proven to have a language","Stories of dolphins helping sailors began in modern times","Dolphins care for pregnant mothers","Dolphins are the fastest creatures in the sea"], ans: 2 },
+    { q: "The tone of the passage toward dolphins is best described as _____.", opts: ["indifferent","critical","admiring and respectful","fearful"], ans: 2 },
+    { q: "What does the passage imply about humans who destroy dolphins?", opts: ["They are proving their intelligence","They are fulfilling a natural role","They appear less superior, not more","They are protecting the ocean"], ans: 2 },
+    { q: "The word 'complex' in 'their society is more complex' means _____.", opts: ["simple","small","sophisticated","dangerous"], ans: 2 },
+    { q: "The phrase 'on the contrary' signals that the author is about to _____ .", opts: ["agree with the previous idea","give an example","present an opposing idea","summarize the passage"], ans: 2 },
+    { q: "Which phrase best captures the author's main argument?", opts: ["Dolphins are dangerous to humans","Killing dolphins proves our strength","Understanding dolphins reveals our own flaws when we harm them","Dolphins will eventually communicate like humans"], ans: 2 },
+    { q: "The word 'superior' means _____.", opts: ["below average","equal","better","similar"], ans: 2 },
+  ],
+  // ── TOPIC 1: STRESS ── 20 questions
+  [
+    { q: "The expression 'Stop the world, I want to get off!' refers to a feeling of _____.", opts: ["joy","excitement","panic and stress","boredom"], ans: 2 },
+    { q: "'Stress' is defined in the passage as _____.", opts: ["physical pain","pressure or tension","a mental illness","a type of exercise"], ans: 1 },
+    { q: "Stress is described as one of the most common causes of _____ in modern life.", opts: ["happiness","health problems","addiction","financial problems"], ans: 1 },
+    { q: "Which of the following is a physical effect of stress on the heart?", opts: ["It slows the pulse rate","It can cause high blood pressure","It strengthens the heart","It reduces blood flow to the brain"], ans: 1 },
+    { q: "Stress can affect the respiratory system by leading to _____.", opts: ["headaches","asthma","stomach aches","depression"], ans: 1 },
+    { q: "Breathing too fast due to stress results in a loss of important _____.", opts: ["oxygen","nitrogen","carbon dioxide","blood pressure"], ans: 2 },
+    { q: "Which body system does the passage NOT mention as being affected by stress?", opts: ["The heart","The stomach","The lungs","The arms"], ans: 3 },
+    { q: "People suffering from stress often feel _____.", opts: ["joyous and energetic","anxious and tired","calm and focused","confident and strong"], ans: 1 },
+    { q: "Which of the following is an example of emotional overreaction due to stress?", opts: ["A parent reading calmly","A parent yelling at a child for spilling juice","A student studying quietly","A worker taking a day off"], ans: 1 },
+    { q: "Stress can make people feel angry, moody, or _____.", opts: ["generous","nervous","confident","playful"], ans: 1 },
+    { q: "Depression is described in the passage as _____.", opts: ["a short feeling of sadness","a physical disease","an extreme feeling of sadness and hopelessness","a normal emotional response"], ans: 2 },
+    { q: "Alcoholism can develop from stress because _____.", opts: ["alcohol is cheap","people use alcohol to relieve stress","alcohol is healthy","doctors recommend alcohol"], ans: 1 },
+    { q: "Which eating disorder is mentioned as being sometimes caused by stress?", opts: ["Bulimia","Obesity","Anorexia","Diabetes"], ans: 2 },
+    { q: "According to the passage, if stress is allowed to continue, _____ is put at risk.", opts: ["physical fitness","financial security","one's mental health","social relationships"], ans: 2 },
+    { q: "The passage says stress has a great influence on the health of our bodies, our feelings, and our _____.", opts: ["careers","relationships","minds","finances"], ans: 2 },
+    { q: "The word 'numerous' in 'There are numerous physical effects' means _____.", opts: ["few","some","many","unknown"], ans: 2 },
+    { q: "The phrase 'result in' means _____.", opts: ["cause","prevent","describe","reduce"], ans: 0 },
+    { q: "Which of the following is NOT caused by long-term stress according to the passage?", opts: ["Depression","Alcoholism","Anorexia","Bloating"], ans: 3 },
+    { q: "The author's final advice in the passage is to _____.", opts: ["work harder","take medication","reduce stress and rest","see a doctor immediately"], ans: 2 },
+    { q: "The word 'eventually' in 'it may eventually result in mental illness' means _____.", opts: ["immediately","never","at some point in the future","quickly"], ans: 2 },
+  ],
+  // ── TOPIC 2: DIGITAL HABITS ── 20 questions
+  [
+    { q: "Who is joining Facebook in increasing numbers in the UK?", opts: ["Teenagers under 17","Children aged 10–14","People aged 55 and over","University students"], ans: 2 },
+    { q: "How many Facebook users in the UK are aged 55–64?", opts: ["2.2 million","2.9 million","3.5 million","4.1 million"], ans: 2 },
+    { q: "Why did Sheila join Facebook?", opts: ["To find a job","To watch videos of her grandchildren","To follow celebrities","To read the news"], ans: 1 },
+    { q: "How did Sheila's family stay connected when she was a child?", opts: ["By telephone","By email","By letters and photos in the post","By visiting in person"], ans: 2 },
+    { q: "Why is it ironic that grandparents are joining Facebook?", opts: ["They are too old for technology","Their grandchildren are leaving the site","Facebook is too expensive for them","They prefer other platforms"], ans: 1 },
+    { q: "How many UK users of Facebook are under 17?", opts: ["2.9 million","3.5 million","1.5 million","2.2 million"], ans: 3 },
+    { q: "Why does Chloe sleep with her phone?", opts: ["She uses it to watch movies","It is her alarm clock","She is afraid of the dark","She chats with friends all night"], ans: 1 },
+    { q: "What are teenagers missing out on by spending too much time on their phones?", opts: ["Sleep","Exercise","Face-to-face time with friends","Schoolwork"], ans: 2 },
+    { q: "How has Facebook changed Sheila's life?", opts: ["She found a new job","She reconnected with old friends from school","She learned to use computers","She moved to a new city"], ans: 1 },
+    { q: "Who are described as the 'early adopters' of smartphones?", opts: ["Teenagers","Grandparents","Parents in their 30s","Children under 10"], ans: 2 },
+    { q: "What does Peter do on evenings and weekends to limit his phone use?", opts: ["He turns his phone off completely","He gives it to his children","He removes his SIM card and uses a basic phone","He deletes his social media apps"], ans: 2 },
+    { q: "What can Peter's basic phone do?", opts: ["Everything a smartphone does","Only make calls and send texts","Only connect to the internet","Only play music"], ans: 1 },
+    { q: "Why does Peter still keep a basic phone rather than no phone at all?", opts: ["It is cheaper","He needs it for work","In case of emergencies","His children need to call him"], ans: 2 },
+    { q: "What is the main reason Peter changed his phone habits?", opts: ["He lost his smartphone","He wanted to save money","He wanted to set a better example for his children","His employer told him to"], ans: 2 },
+    { q: "The word 'ironically' in the passage suggests _____.", opts: ["something sad happened","something happened that was unexpected or contrary to what might be expected","something was planned carefully","something was done quickly"], ans: 1 },
+    { q: "The word 'addiction' in the passage means _____.", opts: ["a healthy habit","a technical skill","an unhealthy dependence on something","a type of technology"], ans: 2 },
+    { q: "The phrase 'missing out on' means _____.", opts: ["losing money","not getting the benefit of something","forgetting something","avoiding danger"], ans: 1 },
+    { q: "What does the article suggest about the different generations' online habits?", opts: ["They are exactly the same","They are completely opposite to what you might expect","They are all becoming less digital","Grandparents use phones more than teenagers"], ans: 1 },
+    { q: "The article ends by asking whether other generations will follow which trend?", opts: ["Joining more social media platforms","Using faster smartphones","Moving toward a less digital life","Buying newer technology"], ans: 2 },
+    { q: "What is the central theme of the article?", opts: ["The history of the internet","How social media affects health","How different generations use technology in very different ways","Why teenagers are better at technology than adults"], ans: 2 },
+  ]
+];
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let currentTopic = 0;
+let currentSections = [0, 0, 0];
+const mcqState = [
+  { current: 0, answers: new Array(20).fill(null), submitted: new Array(20).fill(false) },
+  { current: 0, answers: new Array(20).fill(null), submitted: new Array(20).fill(false) },
+  { current: 0, answers: new Array(20).fill(null), submitted: new Array(20).fill(false) },
+];
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+window.onload = () => {
+  [0,1,2].forEach(t => {
+    buildFitb(t);
+    buildMcq(t);
   });
+  updateProgress();
+};
+
+// ════════════════════════════════════════════════════════════
+// TOPIC NAVIGATION
+// ════════════════════════════════════════════════════════════
+function switchTopic(idx) {
+  document.querySelectorAll('.topic-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('topic-' + idx).classList.add('active');
+  document.querySelector('[data-topic="' + idx + '"]').classList.add('active');
+  currentTopic = idx;
+  updateProgress();
 }
 
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const target = document.getElementById('page-' + id);
-  if (target) {
-    target.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-  updateProgress(id);
-  updateNavActive(id);
-  // close mobile nav
-  document.getElementById('navLinks').classList.remove('open');
-  return false;
+function nextTopic() {
+  if (currentTopic < 2) switchTopic(currentTopic + 1);
+}
+function prevTopic() {
+  if (currentTopic > 0) switchTopic(currentTopic - 1);
 }
 
-function goHome() { showPage('home'); }
-
-function toggleNav() {
-  document.getElementById('navLinks').classList.toggle('open');
+function updateProgress() {
+  const pct = ((currentTopic + 1) / 3) * 100;
+  document.getElementById('globalProgress').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = 'Topic ' + (currentTopic + 1) + ' of 3';
 }
 
-// ── READ MORE ──
-function toggleReadMore(btn) {
-  const content = btn.nextElementSibling;
-  content.classList.toggle('open');
-  const span = btn.querySelector('span:first-child');
-  const arrow = btn.querySelector('span:last-child');
-  if (content.classList.contains('open')) {
-    span.textContent = 'Read less';
-    arrow.textContent = '▴';
-  } else {
-    span.textContent = 'Read more';
-    arrow.textContent = '▾';
-  }
+// ════════════════════════════════════════════════════════════
+// SECTION NAVIGATION
+// ════════════════════════════════════════════════════════════
+function switchSection(topic, section) {
+  const panel = document.getElementById('topic-' + topic);
+  panel.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  panel.querySelectorAll('.sec-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('t' + topic + '-s' + section).classList.add('active');
+  panel.querySelectorAll('.sec-btn')[section].classList.add('active');
+  currentSections[topic] = section;
 }
 
-// ── QUIZ ENGINE ──
-function selectOption(btn) {
-  const q = btn.closest('.quiz-q');
-  // Only allow selection if quiz not yet submitted
-  if (q.dataset.answered === 'true') return;
-  q.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  btn.style.borderColor = '#fff';
-  btn.style.background = 'rgba(255,255,255,0.18)';
-}
+// ════════════════════════════════════════════════════════════
+// FILL IN THE BLANK
+// ════════════════════════════════════════════════════════════
+function buildFitb(topicIdx) {
+  const data = FITB_DATA[topicIdx];
+  const container = document.getElementById('fitb-t' + topicIdx + '-passage');
+  let html = '';
+  let blankIdx = 0;
 
-function submitQuiz(quizId) {
-  const quiz = document.getElementById(quizId);
-  const questions = quiz.querySelectorAll('.quiz-q');
-  let correct = 0;
-  let total = questions.length;
-  let allAnswered = true;
-
-  questions.forEach(q => {
-    const options = q.querySelectorAll('.quiz-option');
-    const selected = q.querySelector('.quiz-option.selected');
-    const feedback = q.querySelector('.q-feedback');
-    const correctIdx = parseInt(q.dataset.correct);
-
-    if (!selected) { allAnswered = false; return; }
-
-    q.dataset.answered = 'true';
-    const selectedIdx = Array.from(options).indexOf(selected);
-
-    options.forEach((opt, i) => {
-      opt.disabled = true;
-      opt.style.borderColor = '';
-      opt.style.background = '';
-      if (i === correctIdx) opt.classList.add('correct');
-      else if (i === selectedIdx && selectedIdx !== correctIdx) opt.classList.add('wrong');
-    });
-
-    if (selectedIdx === correctIdx) {
-      correct++;
-      feedback.textContent = '✓ Correct! Well done.';
-      feedback.className = 'q-feedback show ok';
+  data.segments.forEach(seg => {
+    if (typeof seg === 'string') {
+      html += seg;
     } else {
-      feedback.textContent = '✗ Not quite — the correct answer is highlighted in green.';
-      feedback.className = 'q-feedback show bad';
+      const id = 't' + topicIdx + '_blank_' + blankIdx;
+      const hint = seg.hint;
+      const wordLen = seg.word.replace(/ /g, '').length;
+      html += `<span class="blank-wrap">
+        <input class="blank-input" id="${id}" type="text" autocomplete="off" spellcheck="false"
+          data-answer="${seg.word.toLowerCase()}" placeholder="${'_'.repeat(Math.min(wordLen,10))}" style="width:${Math.max(70, wordLen*10)}px">
+        <button class="hint-btn" onclick="showHint(this, '${hint.replace(/'/g,"\\'")}')">Hint</button>
+        <span class="hint-text" id="${id}_hint"></span>
+      </span>`;
+      blankIdx++;
     }
   });
 
-  if (!allAnswered) {
-    alert('Please answer all questions before submitting.');
-    return;
-  }
-
-  // Disable submit button
-  quiz.querySelector('.quiz-submit-btn').disabled = true;
-
-  // Show result
-  const result = quiz.querySelector('.quiz-result');
-  result.classList.add('show');
-  result.querySelector('.score-num').textContent = correct + '/' + total;
-
-  const pct = Math.round((correct / total) * 100);
-  let msg = '';
-  if (pct === 100) msg = '🎉 Perfect score! Outstanding work.';
-  else if (pct >= 66) msg = '👍 Good understanding. Review the highlighted answers to strengthen your knowledge.';
-  else msg = '📖 Keep studying! Read the section again and try once more.';
-  result.querySelector('.result-msg').textContent = msg;
+  container.innerHTML = html;
 }
 
-function retryQuiz(quizId) {
-  const quiz = document.getElementById(quizId);
-  quiz.querySelectorAll('.quiz-q').forEach(q => {
-    q.dataset.answered = 'false';
-    q.querySelectorAll('.quiz-option').forEach(opt => {
-      opt.disabled = false;
-      opt.classList.remove('selected','correct','wrong');
-      opt.style.borderColor = '';
-      opt.style.background = '';
-    });
-    const feedback = q.querySelector('.q-feedback');
-    feedback.className = 'q-feedback';
-    feedback.textContent = '';
+function showHint(btn, hint) {
+  const hintEl = btn.nextElementSibling;
+  hintEl.textContent = '💡 ' + hint;
+  hintEl.classList.add('visible');
+  btn.textContent = 'Hint ✓';
+  btn.disabled = true;
+}
+
+function checkFitb(topicIdx) {
+  const inputs = document.querySelectorAll(`#fitb-t${topicIdx}-passage .blank-input`);
+  let correct = 0;
+  inputs.forEach(inp => {
+    const userVal = inp.value.trim().toLowerCase();
+    const correctVal = inp.dataset.answer;
+    inp.classList.remove('correct', 'wrong');
+    if (userVal === correctVal) {
+      inp.classList.add('correct');
+      correct++;
+    } else {
+      inp.classList.add('wrong');
+    }
   });
-  quiz.querySelector('.quiz-submit-btn').disabled = false;
-  quiz.querySelector('.quiz-result').classList.remove('show');
+  const total = inputs.length;
+  const resultEl = document.getElementById('fitb-result-' + topicIdx);
+  resultEl.classList.remove('good', 'bad');
+  resultEl.classList.add('show');
+  if (correct === total) {
+    resultEl.classList.add('good');
+    resultEl.textContent = `🎉 Perfect! You got all ${total} blanks correct!`;
+  } else {
+    resultEl.classList.add('bad');
+    resultEl.textContent = `You got ${correct} out of ${total} correct. Check the red ones and try again!`;
+  }
+}
+
+function resetFitb(topicIdx) {
+  const inputs = document.querySelectorAll(`#fitb-t${topicIdx}-passage .blank-input`);
+  inputs.forEach(inp => {
+    inp.value = '';
+    inp.classList.remove('correct', 'wrong');
+  });
+  document.getElementById('fitb-result-' + topicIdx).classList.remove('show');
+
+  // reset hints
+  document.querySelectorAll(`#fitb-t${topicIdx}-passage .hint-btn`).forEach(b => {
+    b.textContent = 'Hint';
+    b.disabled = false;
+  });
+  document.querySelectorAll(`#fitb-t${topicIdx}-passage .hint-text`).forEach(h => {
+    h.classList.remove('visible');
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// MCQ
+// ════════════════════════════════════════════════════════════
+function buildMcq(t) {
+  renderMcqQuestion(t);
+}
+
+function renderMcqQuestion(t) {
+  const container = document.getElementById('mcq-' + t);
+  const state = mcqState[t];
+  const questions = MCQ_DATA[t];
+  const q = state.current;
+  const data = questions[q];
+  const score = state.answers.filter((a, i) => a === questions[i].ans).length;
+  const answered = state.submitted.filter(Boolean).length;
+
+  // Dots
+  let dotsHtml = '<div class="mcq-dots">';
+  for (let i = 0; i < 20; i++) {
+    let cls = 'mcq-dot';
+    if (i === q) cls += ' current';
+    if (state.submitted[i]) {
+      cls += state.answers[i] === questions[i].ans ? ' answered-correct' : ' answered-wrong';
+    }
+    dotsHtml += `<div class="${cls}" onclick="goToQuestion(${t},${i})">${i+1}</div>`;
+  }
+  dotsHtml += '</div>';
+
+  let optionsHtml = '';
+  const letters = ['A','B','C','D'];
+  data.opts.forEach((opt, i) => {
+    let cls = 'option-btn';
+    if (state.submitted[q]) {
+      if (i === data.ans) cls += ' correct';
+      else if (i === state.answers[q] && state.answers[q] !== data.ans) cls += ' wrong';
+    }
+    const disabled = state.submitted[q] ? 'disabled' : '';
+    optionsHtml += `<button class="${cls}" ${disabled} onclick="selectAnswer(${t},${i})">
+      <span class="opt-letter">${letters[i]}</span>${opt}
+    </button>`;
+  });
+
+  let feedbackHtml = '';
+  if (state.submitted[q]) {
+    if (state.answers[q] === data.ans) {
+      feedbackHtml = `<div class="q-feedback correct-fb show">✅ Correct! Well done.</div>`;
+    } else {
+      feedbackHtml = `<div class="q-feedback wrong-fb show">❌ Incorrect. The correct answer is: <strong>${data.opts[data.ans]}</strong></div>`;
+    }
+  }
+
+  const showResult = answered === 20;
+
+  let html = '';
+  if (showResult) {
+    const pct = Math.round((score / 20) * 100);
+    let msg = '';
+    if (score === 20) msg = '🏆 Outstanding! A perfect score!';
+    else if (score >= 16) msg = '🌟 Excellent work! You clearly understand the material.';
+    else if (score >= 12) msg = '👍 Good job! Review the questions you missed.';
+    else if (score >= 8) msg = '📚 Keep studying! Re-read the summary and try again.';
+    else msg = '💪 Don\'t give up! Review the material carefully and retake the quiz.';
+
+    html = `<div class="result-screen">
+      <div class="score-big"><span>${score}</span>/20</div>
+      <div class="score-sub">${pct}% — ${answered} questions answered</div>
+      <div class="result-msg">${msg}</div>
+      ${dotsHtml}
+      <button class="btn-primary" onclick="resetMcq(${t})">Retake Quiz</button>
+    </div>`;
+  } else {
+    html = `
+      <div class="mcq-header">
+        <span class="mcq-counter">Question ${q+1} of 20</span>
+        <span class="mcq-score-badge">Score: ${score}/${answered}</span>
+      </div>
+      ${dotsHtml}
+      <div class="question-card">
+        <div class="q-num">Question ${q+1}</div>
+        <div class="q-text">${data.q}</div>
+        <div class="options">${optionsHtml}</div>
+        ${feedbackHtml}
+      </div>
+      <div class="mcq-nav">
+        <button class="btn-secondary" onclick="goToQuestion(${t},${Math.max(0,q-1)})" ${q===0?'disabled':''}>← Previous</button>
+        ${q < 19 
+          ? `<button class="btn-primary" onclick="goToQuestion(${t},${q+1})">Next →</button>`
+          : `<button class="btn-primary" onclick="finishMcq(${t})">See Results</button>`
+        }
+      </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function selectAnswer(t, optIdx) {
+  const state = mcqState[t];
+  const q = state.current;
+  if (state.submitted[q]) return;
+  state.answers[q] = optIdx;
+  state.submitted[q] = true;
+  renderMcqQuestion(t);
+}
+
+function goToQuestion(t, idx) {
+  mcqState[t].current = idx;
+  renderMcqQuestion(t);
+}
+
+function finishMcq(t) {
+  mcqState[t].current = 0;
+  renderMcqQuestion(t);
+}
+
+function resetMcq(t) {
+  mcqState[t] = {
+    current: 0,
+    answers: new Array(20).fill(null),
+    submitted: new Array(20).fill(false)
+  };
+  renderMcqQuestion(t);
 }
 </script>
 </body>
-</html>
+  </html>
