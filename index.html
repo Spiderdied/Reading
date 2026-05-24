@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ReadFill — Fill in the Blanks Practice</title>
 <style>
-  /* ===== DESIGN TOKENS ===== */
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap');
+
   :root {
     --bg:         #f5f2eb;
     --bg-card:    #fffdf8;
@@ -22,7 +23,7 @@
     --radius:     12px;
     --radius-sm:  6px;
     --font-head:  'Playfair Display', Georgia, serif;
-    --font-body:  'Source Serif 4', 'Georgia', serif;
+    --font-body:  'Source Serif 4', Georgia, serif;
     --font-ui:    'DM Sans', system-ui, sans-serif;
     --transition: 0.2s ease;
   }
@@ -42,10 +43,6 @@
     --shadow-lg:  0 8px 40px rgba(0,0,0,0.5);
   }
 
-  /* ===== GOOGLE FONTS ===== */
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap');
-
-  /* ===== RESET & BASE ===== */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -57,7 +54,6 @@
     transition: background var(--transition), color var(--transition);
   }
 
-  /* ===== HEADER ===== */
   header {
     background: var(--bg-card);
     border-bottom: 1px solid var(--border);
@@ -82,37 +78,27 @@
 
   .logo span { color: var(--accent); }
 
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
+  .header-actions { display: flex; align-items: center; gap: 0.75rem; }
 
   .theme-toggle {
     background: var(--bg-input);
     border: 1px solid var(--border);
     color: var(--text);
-    width: 38px;
-    height: 38px;
+    width: 38px; height: 38px;
     border-radius: 50%;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-size: 1.1rem;
     transition: all var(--transition);
   }
-
   .theme-toggle:hover { background: var(--border); }
 
-  /* ===== LAYOUT ===== */
   main {
     max-width: 900px;
     margin: 0 auto;
     padding: 2.5rem 1.5rem 5rem;
   }
 
-  /* ===== SECTION CARDS ===== */
   .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -146,7 +132,6 @@
     line-height: 1.3;
   }
 
-  /* ===== TEXTAREA ===== */
   textarea {
     width: 100%;
     min-height: 200px;
@@ -162,13 +147,11 @@
     outline: none;
     transition: border-color var(--transition), box-shadow var(--transition);
   }
-
   textarea:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(192,57,43,0.12);
   }
 
-  /* ===== CONTROLS ROW ===== */
   .controls {
     display: flex;
     flex-wrap: wrap;
@@ -186,13 +169,11 @@
     align-items: center;
     gap: 0.5rem;
   }
-
   .blank-count-label input[type="range"] {
     accent-color: var(--accent);
     width: 90px;
   }
 
-  /* ===== BUTTONS ===== */
   .btn {
     font-family: var(--font-ui);
     font-size: 0.85rem;
@@ -214,7 +195,6 @@
     color: #fff;
     box-shadow: 0 2px 8px rgba(192,57,43,0.25);
   }
-
   .btn-primary:hover {
     background: #a93226;
     box-shadow: 0 4px 14px rgba(192,57,43,0.35);
@@ -226,27 +206,18 @@
     color: var(--text);
     border: 1px solid var(--border);
   }
-
-  .btn-secondary:hover {
-    background: var(--border);
-    transform: translateY(-1px);
-  }
+  .btn-secondary:hover { background: var(--border); transform: translateY(-1px); }
 
   .btn-success {
     background: var(--correct);
     color: #fff;
     box-shadow: 0 2px 8px rgba(39,174,96,0.25);
   }
-
-  .btn-success:hover {
-    background: #219a52;
-    transform: translateY(-1px);
-  }
+  .btn-success:hover { background: #219a52; transform: translateY(-1px); }
 
   .btn:active { transform: translateY(0); }
   .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
-  /* ===== QUIZ PASSAGE AREA ===== */
   #quiz-section { display: none; }
 
   .passage-display {
@@ -255,13 +226,8 @@
     line-height: 1.95;
     color: var(--text);
   }
+  .passage-display p { margin-bottom: 1.1em; }
 
-  /* Paragraphs inside passage */
-  .passage-display p {
-    margin-bottom: 1.1em;
-  }
-
-  /* Blank input fields */
   .blank-input {
     display: inline-block;
     border: none;
@@ -278,27 +244,23 @@
     transition: border-color var(--transition), background var(--transition);
     vertical-align: baseline;
   }
-
   .blank-input:focus {
     border-bottom-color: var(--accent-2);
     background: rgba(230,126,34,0.06);
     border-radius: 3px 3px 0 0;
   }
-
   .blank-input.correct {
     border-bottom-color: var(--correct);
     color: var(--correct);
     background: rgba(39,174,96,0.07);
     border-radius: 3px 3px 0 0;
   }
-
   .blank-input.wrong {
     border-bottom-color: var(--wrong);
     color: var(--wrong);
     background: rgba(192,57,43,0.07);
     border-radius: 3px 3px 0 0;
   }
-
   .correct-hint {
     font-family: var(--font-ui);
     font-size: 0.72rem;
@@ -306,7 +268,6 @@
     margin-left: 2px;
     font-style: italic;
   }
-
   .blank-input.revealed {
     border-bottom-color: var(--accent-2);
     color: var(--accent-2);
@@ -315,11 +276,7 @@
     border-radius: 3px 3px 0 0;
   }
 
-  /* ===== SCORE CARD ===== */
-  #score-panel {
-    display: none;
-    animation: fadeUp 0.35s ease both;
-  }
+  #score-panel { display: none; animation: fadeUp 0.35s ease both; }
 
   .score-grid {
     display: grid;
@@ -327,7 +284,6 @@
     gap: 1rem;
     margin-bottom: 1.25rem;
   }
-
   .score-stat {
     background: var(--bg-input);
     border: 1px solid var(--border);
@@ -335,7 +291,6 @@
     padding: 1rem;
     text-align: center;
   }
-
   .score-stat .number {
     font-family: var(--font-head);
     font-size: 2.2rem;
@@ -343,7 +298,6 @@
     line-height: 1;
     margin-bottom: 0.25rem;
   }
-
   .score-stat .label {
     font-family: var(--font-ui);
     font-size: 0.73rem;
@@ -351,12 +305,10 @@
     text-transform: uppercase;
     color: var(--text-muted);
   }
-
   .score-stat.correct-stat .number { color: var(--correct); }
   .score-stat.wrong-stat   .number { color: var(--wrong); }
   .score-stat.pct-stat     .number { color: var(--accent-2); }
 
-  /* Progress bar */
   .progress-bar-wrap {
     background: var(--border);
     border-radius: 99px;
@@ -364,37 +316,16 @@
     overflow: hidden;
     margin-bottom: 1.5rem;
   }
-
   .progress-bar-fill {
     height: 100%;
     border-radius: 99px;
     background: linear-gradient(90deg, var(--accent), var(--accent-2));
     transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+  .score-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 
-  .score-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-  }
+  .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
 
-  /* ===== DIVIDER ===== */
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 1.5rem 0;
-  }
-
-  /* ===== NOTICE / EMPTY STATE ===== */
-  .notice {
-    font-family: var(--font-ui);
-    font-size: 0.88rem;
-    color: var(--text-muted);
-    text-align: center;
-    padding: 2rem;
-  }
-
-  /* ===== RESPONSIVE ===== */
   @media (max-width: 600px) {
     main { padding: 1.5rem 1rem 4rem; }
     .card { padding: 1.25rem; }
@@ -408,7 +339,6 @@
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
 <header>
   <div class="logo">Read<span>Fill</span></div>
   <div class="header-actions">
@@ -416,28 +346,25 @@
   </div>
 </header>
 
-<!-- ===== MAIN ===== -->
 <main>
 
-  <!-- STEP 1: Paste Passage -->
   <div class="card" id="input-section">
     <div class="section-label">Step 1</div>
     <h2 class="section-title">Paste or edit a reading passage</h2>
-    <textarea id="passageInput" placeholder="Paste any English reading passage here…" spellcheck="false"></textarea>
+    <textarea id="passageInput" spellcheck="false"></textarea>
     <div class="controls">
       <button class="btn btn-primary" id="generateBtn">⚡ Generate Quiz</button>
       <button class="btn btn-secondary" id="newBlanksBtn" disabled>🔀 New Blank Selection</button>
       <div class="blank-count-label">
-        Blanks: <strong id="blankCountDisplay">25</strong>
-        <input type="range" id="blankCount" min="5" max="40" value="25" />
+        Blanks: <strong id="blankCountDisplay">20</strong>
+        <input type="range" id="blankCount" min="5" max="40" value="20" />
       </div>
     </div>
   </div>
 
-  <!-- STEP 2: Quiz -->
   <div class="card" id="quiz-section">
     <div class="section-label">Step 2 — Fill in the Blanks</div>
-    <h2 class="section-title" id="quiz-title">Reading Quiz</h2>
+    <h2 class="section-title">Digital Habits Across Generations</h2>
     <div class="divider"></div>
     <div class="passage-display" id="passageDisplay"></div>
     <div class="divider"></div>
@@ -448,7 +375,6 @@
     </div>
   </div>
 
-  <!-- STEP 3: Score -->
   <div class="card" id="score-panel">
     <div class="section-label">Your Score</div>
     <h2 class="section-title">Results</h2>
@@ -478,50 +404,34 @@
 </main>
 
 <script>
-/* =====================================================================
-   ReadFill — Core Logic
-   ===================================================================== */
+/* ===== DEFAULT PASSAGE: Digital Habits Across Generations ===== */
+const DEFAULT_PASSAGE = `Today's grandparents are joining their grandchildren on social media, but the different generations' online habits couldn't be more different. In the UK the over-55s are joining Facebook in increasing numbers, meaning that they will soon be the site's second biggest user group, with 3.5 million users aged 55–64 and 2.9 million over-65s. Sheila, aged 59, says, "I joined to see what my grandchildren are doing, as my daughter posts videos and photos of them. It's a much better way to see what they're doing than waiting for letters and photos in the post. That's how we did it when I was a child, but I think I'm lucky I get to see so much more of their lives than my grandparents did."
 
-/* ----- DEFAULT PASSAGE ----- */
-const DEFAULT_PASSAGE = `Dolphins
+Ironically, Sheila's grandchildren are less likely to use Facebook themselves. Children under 17 in the UK are leaving the site – only 2.2 million users are under 17 – but they're not going far from their smartphones. Chloe, aged 15, even sleeps with her phone. "It's my alarm clock so I have to," she says. "I look at it before I go to sleep and as soon as I wake up." Unlike her grandmother's generation, Chloe's age group is spending so much time on their phones at home that they are missing out on spending time with their friends in real life. Sheila, on the other hand, has made contact with old friends from school she hasn't heard from in forty years. "We use Facebook to arrange to meet all over the country," she says. "It's changed my social life completely."
 
-Dolphins are regarded as the friendliest creatures in the sea and stories of them helping drowning sailors have been common since Roman times. The more we learn about dolphins, the more we realize that their society is more complex than people previously imagined. They look after other dolphins when they are ill, care for pregnant mothers and protect the weakest in the community, as we do. Some scientists have suggested that dolphins have a language but it is much more probable that they communicate with each other without needing words. Could any of these mammals be more intelligent than man? Certainly the most common argument in favor of man's superiority over them that we can kill them more easily than they can kill us is the least satisfactory. On the contrary, the more we discover about these remarkable creatures, the less we appear superior when we destroy them.
+Teenagers might have their parents to thank for their smartphone and social media addiction as their parents were the early adopters of the smartphone. Peter, 38 and father of two teenagers, reports that he used to be on his phone or laptop constantly. "I was always connected and I felt like I was always working," he says. "How could I tell my kids to get off their phones if I was always in front of a screen myself?" So, in the evenings and at weekends, he takes his SIM card out of his smartphone and puts it into an old-style mobile phone that can only make calls and send text messages. "I'm not completely cut off from the world in case of emergencies, but the important thing is I'm setting a better example to my kids and spending more quality time with them." Is it only a matter of time until the generation above and below Peter catches up with the new trend for a less digital life?`;
 
-The Effects of Stress
-
-There is a famous expression in English: "Stop the world, I want to get off!" This expression refers to a feeling of panic, or stress, that makes a person want to stop whatever they are doing, try to relax, and become calm again. Stress means pressure or tension. It is one of the most common causes of health problems in modern life. Too much stress results in physical, emotional, and mental health problems.
-
-There are numerous physical effects of stress. Stress can affect the heart. It can increase the pulse rate, make the heart miss beats, and can cause high blood pressure. Stress can affect the respiratory system. It can lead to asthma. Emotions are also easily affected by stress. People suffering from stress often feel anxious. They may have panic attacks. They may feel tired all the time. Long-term stress can lead to a variety of serious mental illnesses. Depression, an extreme feeling of sadness and hopelessness, can be the result of continued and increasing stress. Alcoholism and other addictions often develop as a result of overuse of alcohol or drugs to try to relieve stress.`;
-
-/* ----- STOP WORDS (words never removed as blanks) ----- */
+/* ===== STOP WORDS ===== */
 const STOP_WORDS = new Set([
-  // Articles
   'a','an','the',
-  // Prepositions
   'in','on','at','by','for','with','about','against','between','into',
   'through','during','before','after','above','below','to','from','up',
   'down','out','off','over','under','again','further','then','once',
-  'of','about','as','into','through','during','including','until',
-  'against','nor','but','or','yet','so','although','because','since',
-  'while','whether','though','where','when','which','that','who','whom',
-  // Pronouns
+  'of','as','whether','though','where','when','which','that','who','whom',
   'i','me','my','myself','we','our','ours','ourselves','you','your',
   'yours','yourself','yourselves','he','him','his','himself','she','her',
   'hers','herself','it','its','itself','they','them','their','theirs',
-  'themselves','what','who','which','this','that','these','those',
-  // Helping verbs
+  'themselves','what','this','these','those',
   'am','is','are','was','were','be','been','being','have','has','had',
   'do','does','did','will','would','shall','should','may','might',
-  'must','can','could','ought','need','dare','used',
-  // Common tiny words
+  'must','can','could','ought','need',
   'not','no','nor','so','yet','both','either','each','few','more',
   'most','other','some','such','than','too','very','just','any','all',
   'also','only','same','even','there','here','how','if','get','got',
-  'make','made','like','time','much','many','now',
+  'make','made','like','time','much','many','now','but','or','and',
 ]);
 
-/* ----- SYNONYM DICTIONARY ----- */
-/* Add more entries freely — each key maps to an array of accepted synonyms */
+/* ===== SYNONYM DICTIONARY ===== */
 const SYNONYMS = {
   happy:        ['glad','joyful','pleased','content','cheerful','delighted'],
   sad:          ['unhappy','sorrowful','miserable','dejected','downcast'],
@@ -531,76 +441,59 @@ const SYNONYMS = {
   intelligent:  ['smart','clever','bright','brilliant','gifted'],
   difficult:    ['hard','tough','challenging','demanding'],
   easy:         ['simple','effortless','straightforward','uncomplicated'],
-  fast:         ['quick','rapid','swift','speedy','hasty'],
+  fast:         ['quick','rapid','swift','speedy'],
   slow:         ['sluggish','unhurried','gradual','leisurely'],
   start:        ['begin','commence','initiate','launch','open'],
   end:          ['finish','conclude','stop','terminate','close','complete'],
   afraid:       ['scared','frightened','fearful','terrified'],
   angry:        ['mad','furious','irate','annoyed','outraged'],
-  beautiful:    ['pretty','lovely','attractive','gorgeous','stunning'],
-  show:         ['display','present','reveal','demonstrate','exhibit'],
-  help:         ['assist','aid','support','facilitate'],
-  important:    ['significant','crucial','vital','essential','key'],
-  common:       ['frequent','widespread','prevalent','ordinary','usual'],
-  complex:      ['complicated','intricate','involved','elaborate'],
-  suggest:      ['propose','recommend','indicate','imply'],
-  protect:      ['defend','guard','shield','safeguard'],
-  discover:     ['find','uncover','detect','identify','locate'],
-  remarkable:   ['extraordinary','outstanding','notable','exceptional'],
-  communicate:  ['convey','express','interact','correspond'],
-  affect:       ['impact','influence','alter','change'],
-  cause:        ['produce','create','generate','trigger','lead to'],
-  increase:     ['raise','boost','grow','rise','elevate'],
-  result:       ['outcome','consequence','effect','product'],
-  serious:      ['severe','grave','significant','critical'],
-  develop:      ['grow','form','emerge','evolve','advance'],
-  extreme:      ['severe','intense','drastic','radical'],
-  continue:     ['persist','proceed','maintain','sustain'],
-  relieve:      ['ease','reduce','alleviate','lessen','soothe'],
-  famous:       ['well-known','renowned','celebrated','noted','prominent'],
-  superior:     ['better','greater','higher','advanced'],
-  society:      ['community','civilization','culture','world'],
-  language:     ['tongue','speech','communication','dialect'],
-  creature:     ['animal','beast','organism','being'],
-  pressure:     ['stress','strain','tension','burden'],
-  emotional:    ['psychological','mental','feeling','affective'],
-  physical:     ['bodily','corporeal','material','tangible'],
+  joining:      ['connecting','entering','becoming','participating'],
+  join:         ['connect','enter','become','participate'],
+  different:    ['distinct','varied','unlike','diverse','separate'],
+  increasing:   ['growing','rising','expanding','climbing'],
+  leaving:      ['departing','exiting','quitting','abandoning'],
+  spending:     ['using','passing','devoting'],
+  missing:      ['losing','skipping','avoiding'],
+  contact:      ['touch','connection','communication','reach'],
+  arrange:      ['organise','organize','plan','schedule','set up'],
+  changed:      ['altered','transformed','affected','impacted'],
+  addiction:    ['dependence','habit','obsession','reliance'],
+  connected:    ['linked','online','engaged','attached'],
+  working:      ['operating','functioning','labouring','laboring'],
+  emergencies:  ['crises','urgencies','disasters'],
+  setting:      ['establishing','creating','providing','giving'],
+  example:      ['model','instance','demonstration','illustration'],
+  quality:      ['value','standard','worth','excellence'],
+  generation:   ['age group','cohort','era','period'],
+  trend:        ['pattern','tendency','movement','direction'],
+  digital:      ['electronic','online','virtual','technological'],
+  social:       ['communal','public','shared','collective'],
+  mobile:       ['portable','handheld','wireless','cellular'],
+  messages:     ['texts','communications','notes'],
+  completely:   ['totally','entirely','fully','wholly','absolutely'],
+  constantly:   ['always','continuously','continually','all the time'],
+  ironically:   ['paradoxically','surprisingly','unexpectedly'],
+  lucky:        ['fortunate','blessed','privileged'],
+  matter:       ['question','issue','concern','topic'],
+  early:        ['first','initial','pioneering','original'],
+  adopters:     ['users','followers','pioneers'],
 };
 
-/* ----- STATE ----- */
-let currentBlanks  = [];   // [{index, word, token}]
-let currentTokens  = [];   // array of token objects
-let passageText    = '';
-
-/* ----- TOKENIZER ----- */
-/* Splits text into tokens preserving punctuation and whitespace */
+/* ===== TOKENIZER ===== */
 function tokenize(text) {
   const tokens = [];
-  // Match words (including apostrophes), whitespace sequences, or single punctuation chars
   const re = /([A-Za-z][A-Za-z'']*)|(\s+)|([^A-Za-z\s])/g;
   let m;
   while ((m = re.exec(text)) !== null) {
-    if (m[1] !== undefined) {
-      tokens.push({ type: 'word', raw: m[0], lower: m[0].toLowerCase() });
-    } else if (m[2] !== undefined) {
-      tokens.push({ type: 'space', raw: m[0] });
-    } else {
-      tokens.push({ type: 'punct', raw: m[0] });
-    }
+    if      (m[1] !== undefined) tokens.push({ type: 'word',  raw: m[0], lower: m[0].toLowerCase() });
+    else if (m[2] !== undefined) tokens.push({ type: 'space', raw: m[0] });
+    else                         tokens.push({ type: 'punct', raw: m[0] });
   }
   return tokens;
 }
 
-/* ----- CANDIDATE SELECTOR ----- */
-/*
-  Picks `count` word-tokens to blank:
-  - skips stop words and very short words (≤2 chars)
-  - avoids consecutive blanked words
-  - distributes evenly across the passage
-  - avoids repeating the same word form more than twice
-*/
+/* ===== BLANK SELECTOR ===== */
 function selectBlanks(tokens, count) {
-  // Collect eligible word indices
   const eligible = [];
   for (let i = 0; i < tokens.length; i++) {
     const t = tokens[i];
@@ -609,45 +502,39 @@ function selectBlanks(tokens, count) {
     if (STOP_WORDS.has(t.lower)) continue;
     eligible.push(i);
   }
-
   if (eligible.length === 0) return [];
-
   count = Math.min(count, Math.floor(eligible.length * 0.65));
 
-  // Divide eligible pool into `count` segments and pick one randomly from each
-  const segSize = eligible.length / count;
-  const chosen  = new Set();
+  const segSize  = eligible.length / count;
+  const chosen   = new Set();
   const wordFreq = {};
 
   for (let s = 0; s < count; s++) {
-    const segStart = Math.floor(s * segSize);
-    const segEnd   = Math.floor((s + 1) * segSize);
+    const segStart   = Math.floor(s * segSize);
+    const segEnd     = Math.floor((s + 1) * segSize);
     const candidates = eligible.slice(segStart, segEnd);
 
-    // Shuffle candidates within segment
     for (let i = candidates.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
     }
 
-    // Pick first that isn't adjacent to an already-chosen index and not over-used
     for (const idx of candidates) {
       const word = tokens[idx].lower;
       const freq = wordFreq[word] || 0;
-      const adjacentChosen = chosen.has(idx - 1) || chosen.has(idx + 1) ||
-                             chosen.has(idx - 2) || chosen.has(idx + 2);
-      if (!adjacentChosen && freq < 2) {
+      const adj  = chosen.has(idx-1) || chosen.has(idx+1) ||
+                   chosen.has(idx-2) || chosen.has(idx+2);
+      if (!adj && freq < 2) {
         chosen.add(idx);
         wordFreq[word] = freq + 1;
         break;
       }
     }
   }
-
   return [...chosen].sort((a, b) => a - b);
 }
 
-/* ----- BUILD QUIZ HTML ----- */
+/* ===== BUILD QUIZ HTML ===== */
 function buildQuizHTML(tokens, blankIndices) {
   const blankSet = new Set(blankIndices);
   let html = '';
@@ -656,32 +543,22 @@ function buildQuizHTML(tokens, blankIndices) {
   for (let i = 0; i < tokens.length; i++) {
     const t = tokens[i];
     if (t.type === 'space') {
-      // Convert newlines to paragraph breaks
-      if (t.raw.includes('\n\n') || (t.raw.match(/\n/g) || []).length >= 2) {
+      if (t.raw.includes('\n\n') || (t.raw.match(/\n/g)||[]).length >= 2) {
         html += '</p><p>';
-      } else if (t.raw.includes('\n')) {
-        html += ' ';
       } else {
-        html += t.raw;
+        html += ' ';
       }
     } else if (t.type === 'punct') {
       html += escapeHTML(t.raw);
     } else if (blankSet.has(i)) {
-      // Blank field
-      const wordLen = t.raw.length;
-      const w = Math.max(70, Math.min(140, wordLen * 12 + 30));
-      html += `<input
-        type="text"
-        class="blank-input"
+      const w = Math.max(70, Math.min(150, t.raw.length * 12 + 30));
+      html += `<input type="text" class="blank-input"
         data-index="${blankNum}"
         data-answer="${escapeAttr(t.raw)}"
         style="width:${w}px"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        aria-label="Blank ${blankNum + 1}"
-      />`;
+        autocomplete="off" autocorrect="off"
+        autocapitalize="off" spellcheck="false"
+        aria-label="Blank ${blankNum + 1}" />`;
       blankNum++;
     } else {
       html += escapeHTML(t.raw);
@@ -690,93 +567,66 @@ function buildQuizHTML(tokens, blankIndices) {
   return '<p>' + html + '</p>';
 }
 
-/* ----- SYNONYM CHECKER ----- */
-/* Returns true if `attempt` is an accepted answer for `correct` */
+/* ===== SYNONYM CHECKER ===== */
 function isAccepted(attempt, correct) {
   const a = attempt.trim().toLowerCase();
   const c = correct.toLowerCase();
   if (a === c) return true;
-
-  // Check synonyms in both directions
-  const synForCorrect = SYNONYMS[c] || [];
-  if (synForCorrect.includes(a)) return true;
-
-  // Check if `a` is a key whose synonyms include `c`
-  const synForAttempt = SYNONYMS[a] || [];
-  if (synForAttempt.includes(c)) return true;
-
+  if ((SYNONYMS[c]||[]).includes(a)) return true;
+  if ((SYNONYMS[a]||[]).includes(c)) return true;
   return false;
 }
 
-/* ----- CHECK ANSWERS ----- */
+/* ===== CHECK ANSWERS ===== */
 function checkAnswers() {
   const inputs = document.querySelectorAll('.blank-input');
-  let correct = 0, wrong = 0;
+  let correct = 0, wrong = 0, answered = 0;
 
   inputs.forEach(inp => {
-    const answer  = inp.dataset.answer;
-    const attempt = inp.value;
+    const next = inp.nextElementSibling;
+    if (next && next.classList.contains('correct-hint')) next.remove();
+    if (!inp.value.trim()) { inp.classList.remove('correct','wrong'); return; }
 
-    // Remove any existing hint
-    const nextSib = inp.nextElementSibling;
-    if (nextSib && nextSib.classList.contains('correct-hint')) {
-      nextSib.remove();
-    }
-
-    if (!attempt.trim()) {
-      inp.classList.remove('correct', 'wrong');
-      return;
-    }
-
-    if (isAccepted(attempt, answer)) {
-      inp.classList.add('correct');
-      inp.classList.remove('wrong');
-      correct++;
+    answered++;
+    if (isAccepted(inp.value, inp.dataset.answer)) {
+      inp.classList.add('correct'); inp.classList.remove('wrong'); correct++;
     } else {
-      inp.classList.add('wrong');
-      inp.classList.remove('correct');
-      wrong++;
-      // Show correct answer hint
+      inp.classList.add('wrong'); inp.classList.remove('correct'); wrong++;
       const hint = document.createElement('span');
       hint.className = 'correct-hint';
-      hint.textContent = `(${answer})`;
+      hint.textContent = `(${inp.dataset.answer})`;
       inp.insertAdjacentElement('afterend', hint);
     }
   });
-
-  // Count blanks with an answer entered
-  let answered = 0;
-  inputs.forEach(inp => { if (inp.value.trim()) answered++; });
-
-  showScore(correct, wrong, answered, inputs.length);
+  showScore(correct, wrong, answered);
 }
 
-/* ----- SHOW ANSWERS ----- */
+/* ===== SHOW ANSWERS ===== */
 function showAnswers() {
   document.querySelectorAll('.blank-input').forEach(inp => {
-    const nextSib = inp.nextElementSibling;
-    if (nextSib && nextSib.classList.contains('correct-hint')) nextSib.remove();
+    const next = inp.nextElementSibling;
+    if (next && next.classList.contains('correct-hint')) next.remove();
     inp.value = inp.dataset.answer;
-    inp.classList.remove('correct', 'wrong');
+    inp.classList.remove('correct','wrong');
     inp.classList.add('revealed');
     inp.disabled = true;
   });
 }
 
-/* ----- RESET QUIZ ----- */
+/* ===== RESET ===== */
 function resetQuiz() {
   document.querySelectorAll('.blank-input').forEach(inp => {
     inp.value = '';
-    inp.classList.remove('correct', 'wrong', 'revealed');
+    inp.classList.remove('correct','wrong','revealed');
     inp.disabled = false;
-    const nextSib = inp.nextElementSibling;
-    if (nextSib && nextSib.classList.contains('correct-hint')) nextSib.remove();
+    const next = inp.nextElementSibling;
+    if (next && next.classList.contains('correct-hint')) next.remove();
   });
   hideScore();
 }
 
-/* ----- SHOW / HIDE SCORE ----- */
-function showScore(correct, wrong, answered, total) {
+/* ===== SCORE ===== */
+function showScore(correct, wrong, answered) {
   const pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
   document.getElementById('correctCount').textContent = correct;
   document.getElementById('wrongCount').textContent   = wrong;
@@ -791,119 +641,84 @@ function hideScore() {
   document.getElementById('score-panel').style.display = 'none';
 }
 
-/* ----- GENERATE QUIZ ----- */
+/* ===== GENERATE QUIZ ===== */
+let currentTokens = [];
+let passageText   = '';
+
 function generateQuiz(reusePassage = false) {
   if (!reusePassage) {
     passageText = document.getElementById('passageInput').value.trim();
   }
-  if (!passageText) {
-    alert('Please paste a reading passage first.');
-    return;
-  }
+  if (!passageText) { alert('Please paste a reading passage first.'); return; }
 
   const count = parseInt(document.getElementById('blankCount').value, 10);
   currentTokens = tokenize(passageText);
 
   const blankIndices = selectBlanks(currentTokens, count);
-  currentBlanks = blankIndices;
-
   if (blankIndices.length === 0) {
     alert('Not enough suitable words found. Try a longer passage.');
     return;
   }
 
-  const quizHTML = buildQuizHTML(currentTokens, blankIndices);
-  document.getElementById('passageDisplay').innerHTML = quizHTML;
+  document.getElementById('passageDisplay').innerHTML =
+    buildQuizHTML(currentTokens, blankIndices);
 
-  // Show quiz section
-  const quizSection = document.getElementById('quiz-section');
-  quizSection.style.display = 'block';
-  quizSection.style.animation = 'none';
-  requestAnimationFrame(() => {
-    quizSection.style.animation = 'fadeUp 0.4s ease both';
-  });
+  const qs = document.getElementById('quiz-section');
+  qs.style.display = 'block';
+  qs.style.animation = 'none';
+  requestAnimationFrame(() => { qs.style.animation = 'fadeUp 0.4s ease both'; });
 
   hideScore();
-  quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  // Enable "New Blanks" button
-  document.getElementById('newBlanksBtn').disabled  = false;
+  document.getElementById('newBlanksBtn').disabled = false;
+  qs.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-/* ----- HELPERS ----- */
+/* ===== HELPERS ===== */
 function escapeHTML(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-
 function escapeAttr(str) {
-  return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  return str.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-/* ===== EVENT LISTENERS ===== */
-
-// Generate quiz from passage
-document.getElementById('generateBtn').addEventListener('click', () => {
-  generateQuiz(false);
-});
-
-// New blank selection (same passage, different words)
-document.getElementById('newBlanksBtn').addEventListener('click', () => {
-  generateQuiz(true);
-});
-
+/* ===== EVENTS ===== */
+document.getElementById('generateBtn').addEventListener('click', () => generateQuiz(false));
+document.getElementById('newBlanksBtn').addEventListener('click', () => generateQuiz(true));
 document.getElementById('newBlanksBtn2').addEventListener('click', () => {
   generateQuiz(true);
   document.getElementById('score-panel').style.display = 'none';
 });
-
-// Check answers
 document.getElementById('checkBtn').addEventListener('click', checkAnswers);
-
-// Show answers
 document.getElementById('showBtn').addEventListener('click', showAnswers);
-
-// Reset quiz
 document.getElementById('resetBtn').addEventListener('click', resetQuiz);
 document.getElementById('resetBtn2').addEventListener('click', () => {
   resetQuiz();
   document.getElementById('score-panel').style.display = 'none';
 });
 
-// Blank count slider
-const blankCountInput   = document.getElementById('blankCount');
-const blankCountDisplay = document.getElementById('blankCountDisplay');
-blankCountInput.addEventListener('input', () => {
-  blankCountDisplay.textContent = blankCountInput.value;
-});
+const slider  = document.getElementById('blankCount');
+const display = document.getElementById('blankCountDisplay');
+slider.addEventListener('input', () => { display.textContent = slider.value; });
 
-// Dark mode toggle
-const themeBtn = document.getElementById('themeBtn');
-themeBtn.addEventListener('click', () => {
-  const html = document.documentElement;
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const html   = document.documentElement;
   const isDark = html.getAttribute('data-theme') === 'dark';
   html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  themeBtn.textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
 });
 
-// Allow Enter key in blank inputs to jump to the next blank
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.classList.contains('blank-input')) {
     e.preventDefault();
     const inputs = [...document.querySelectorAll('.blank-input')];
     const idx    = inputs.indexOf(e.target);
-    if (idx < inputs.length - 1) {
-      inputs[idx + 1].focus();
-    } else {
-      checkAnswers();
-    }
+    if (idx < inputs.length - 1) inputs[idx + 1].focus();
+    else checkAnswers();
   }
 });
 
-/* ===== INIT — load default passage ===== */
+/* ===== INIT ===== */
 document.getElementById('passageInput').value = DEFAULT_PASSAGE;
 </script>
 </body>
-  </html>
+      </html>
