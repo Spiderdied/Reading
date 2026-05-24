@@ -1,1145 +1,909 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Basic Education Reading Hub</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ReadFill — Fill in the Blanks Practice</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
-
+  /* ===== DESIGN TOKENS ===== */
   :root {
-    --bg: #f5f0e8;
-    --surface: #fffdf8;
-    --surface2: #f0ebe0;
-    --ink: #1a1510;
-    --ink-soft: #5a5248;
-    --ink-faint: #9a9088;
-    --accent1: #2d6a4f;
-    --accent2: #e76f51;
-    --accent3: #457b9d;
-    --correct: #2d6a4f;
-    --wrong: #c1121f;
-    --gold: #c9a84c;
-    --shadow: 0 4px 24px rgba(26,21,16,0.10);
-    --shadow-lg: 0 12px 48px rgba(26,21,16,0.15);
-    --radius: 16px;
-    --radius-sm: 8px;
+    --bg:         #f5f2eb;
+    --bg-card:    #fffdf8;
+    --bg-input:   #ffffff;
+    --border:     #e2ddd4;
+    --text:       #1a1714;
+    --text-muted: #7a7368;
+    --accent:     #c0392b;
+    --accent-2:   #e67e22;
+    --correct:    #27ae60;
+    --wrong:      #c0392b;
+    --shadow:     0 2px 16px rgba(0,0,0,0.07);
+    --shadow-lg:  0 8px 40px rgba(0,0,0,0.12);
+    --radius:     12px;
+    --radius-sm:  6px;
+    --font-head:  'Playfair Display', Georgia, serif;
+    --font-body:  'Source Serif 4', 'Georgia', serif;
+    --font-ui:    'DM Sans', system-ui, sans-serif;
+    --transition: 0.2s ease;
   }
 
+  [data-theme="dark"] {
+    --bg:         #16130f;
+    --bg-card:    #1f1b16;
+    --bg-input:   #2a251e;
+    --border:     #3a342a;
+    --text:       #f0ebe2;
+    --text-muted: #9c9080;
+    --accent:     #e05c4a;
+    --accent-2:   #f0a050;
+    --correct:    #2ecc71;
+    --wrong:      #e74c3c;
+    --shadow:     0 2px 16px rgba(0,0,0,0.3);
+    --shadow-lg:  0 8px 40px rgba(0,0,0,0.5);
+  }
+
+  /* ===== GOOGLE FONTS ===== */
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap');
+
+  /* ===== RESET & BASE ===== */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-body);
     background: var(--bg);
-    color: var(--ink);
+    color: var(--text);
+    line-height: 1.7;
     min-height: 100vh;
-    overflow-x: hidden;
+    transition: background var(--transition), color var(--transition);
   }
 
-  /* ── HEADER ── */
+  /* ===== HEADER ===== */
   header {
-    background: var(--ink);
-    color: var(--bg);
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
     padding: 0 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
     height: 64px;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+    box-shadow: var(--shadow);
   }
+
   .logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.25rem;
+    font-family: var(--font-head);
+    font-size: 1.5rem;
     font-weight: 700;
+    color: var(--text);
     letter-spacing: -0.02em;
-    white-space: nowrap;
-  }
-  .logo span { color: var(--gold); }
-
-  /* ── PROGRESS BAR ── */
-  .progress-wrap {
-    flex: 1;
-    max-width: 320px;
-    background: rgba(255,255,255,0.12);
-    border-radius: 99px;
-    height: 8px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold), var(--accent2));
-    border-radius: 99px;
-    transition: width 0.5s cubic-bezier(.4,0,.2,1);
-  }
-  .progress-label {
-    font-size: 0.75rem;
-    opacity: 0.7;
-    white-space: nowrap;
   }
 
-  /* ── TOPIC NAV ── */
-  .topic-nav {
-    background: var(--surface);
-    border-bottom: 1px solid rgba(26,21,16,0.08);
-    display: flex;
-    overflow-x: auto;
-    gap: 0;
-    scrollbar-width: none;
-  }
-  .topic-nav::-webkit-scrollbar { display: none; }
-  .topic-btn {
-    padding: 1rem 2rem;
-    border: none;
-    background: none;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--ink-soft);
-    cursor: pointer;
-    white-space: nowrap;
-    position: relative;
-    transition: color 0.2s;
-  }
-  .topic-btn::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 50%; right: 50%;
-    height: 3px;
-    border-radius: 3px 3px 0 0;
-    transition: all 0.3s cubic-bezier(.4,0,.2,1);
-  }
-  .topic-btn.active { color: var(--ink); }
-  .topic-btn.active::after { left: 16px; right: 16px; }
-  .topic-btn[data-topic="0"].active::after { background: var(--accent3); }
-  .topic-btn[data-topic="1"].active::after { background: var(--accent2); }
-  .topic-btn[data-topic="2"].active::after { background: var(--accent1); }
-  .topic-btn .icon { margin-right: 6px; }
+  .logo span { color: var(--accent); }
 
-  /* ── SECTION TABS ── */
-  .section-tabs {
-    display: flex;
-    gap: 8px;
-    padding: 1.5rem 2rem 0;
-    max-width: 960px;
-    margin: 0 auto;
-  }
-  .sec-btn {
-    padding: 0.5rem 1.25rem;
-    border-radius: 99px;
-    border: 2px solid transparent;
-    background: var(--surface2);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--ink-soft);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .sec-btn.active {
-    background: var(--ink);
-    color: var(--bg);
-    border-color: var(--ink);
-  }
-
-  /* ── MAIN ── */
-  main {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-
-  .topic-panel { display: none; }
-  .topic-panel.active { display: block; animation: fadeIn 0.3s ease; }
-  .section-panel { display: none; }
-  .section-panel.active { display: block; animation: slideIn 0.3s ease; }
-
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* ── SUMMARY ── */
-  .summary-hero {
-    background: var(--ink);
-    color: var(--bg);
-    border-radius: var(--radius);
-    padding: 2.5rem;
-    margin-bottom: 1.5rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .summary-hero::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    opacity: 0.06;
-  }
-  .t0 .summary-hero::before { background: var(--accent3); }
-  .t1 .summary-hero::before { background: var(--accent2); }
-  .t2 .summary-hero::before { background: var(--accent1); }
-
-  .summary-hero .eyebrow {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    opacity: 0.5;
-    margin-bottom: 0.5rem;
-  }
-  .summary-hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
-    font-weight: 900;
-    line-height: 1.1;
-    margin-bottom: 0.75rem;
-  }
-  .summary-hero p {
-    opacity: 0.75;
-    font-size: 1rem;
-    line-height: 1.6;
-    max-width: 560px;
-  }
-
-  .summary-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  @media (max-width: 640px) { .summary-grid { grid-template-columns: 1fr; } }
-
-  .summary-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    box-shadow: var(--shadow);
-    border-left: 4px solid transparent;
-  }
-  .t0 .summary-card { border-left-color: var(--accent3); }
-  .t1 .summary-card { border-left-color: var(--accent2); }
-  .t2 .summary-card { border-left-color: var(--accent1); }
-  .summary-card h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
-  .summary-card p {
-    font-size: 0.9rem;
-    line-height: 1.65;
-    color: var(--ink-soft);
-  }
-  .summary-card.full { grid-column: 1 / -1; }
-
-  .key-fact {
-    background: var(--surface);
-    border-radius: var(--radius-sm);
-    padding: 0.6rem 0.9rem;
-    font-size: 0.85rem;
-    color: var(--ink-soft);
-    border: 1px solid rgba(26,21,16,0.08);
-    margin-top: 0.5rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  .key-fact::before { content: '→'; opacity: 0.5; flex-shrink: 0; }
-
-  /* ── FILL IN THE BLANK ── */
-  .fitb-passage {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 2rem;
-    box-shadow: var(--shadow);
-    font-size: 1rem;
-    line-height: 2.2;
-    margin-bottom: 1.5rem;
-    border-top: 4px solid var(--gold);
-  }
-  .fitb-passage p { line-height: 2.4; }
-
-  .blank-wrap {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    vertical-align: middle;
-    margin: 0 4px;
-    gap: 2px;
-  }
-  .blank-input {
-    border: none;
-    border-bottom: 2.5px solid var(--ink-faint);
-    background: transparent;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 600;
-    text-align: center;
-    width: 110px;
-    padding: 2px 6px;
-    outline: none;
-    transition: border-color 0.2s, background 0.2s;
-    border-radius: 4px 4px 0 0;
-  }
-  .blank-input:focus { border-bottom-color: var(--ink); background: rgba(26,21,16,0.04); }
-  .blank-input.correct { border-bottom-color: var(--correct); background: rgba(45,106,79,0.08); color: var(--correct); }
-  .blank-input.wrong { border-bottom-color: var(--wrong); background: rgba(193,18,31,0.06); color: var(--wrong); }
-
-  .hint-btn {
-    font-size: 0.65rem;
-    padding: 1px 7px;
-    border-radius: 99px;
-    border: 1px solid var(--ink-faint);
-    background: none;
-    color: var(--ink-faint);
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s;
-  }
-  .hint-btn:hover { border-color: var(--gold); color: var(--gold); }
-  .hint-text {
-    font-size: 0.7rem;
-    color: var(--gold);
-    font-weight: 600;
-    display: none;
-    margin-top: 2px;
-  }
-  .hint-text.visible { display: block; }
-
-  .fitb-controls {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .btn-primary {
-    padding: 0.7rem 1.8rem;
-    border-radius: 99px;
-    border: none;
-    background: var(--ink);
-    color: var(--bg);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
-    box-shadow: 0 4px 12px rgba(26,21,16,0.25);
-  }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(26,21,16,0.3); }
-  .btn-secondary {
-    padding: 0.7rem 1.5rem;
-    border-radius: 99px;
-    border: 2px solid var(--ink-faint);
-    background: transparent;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--ink-soft);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
-
-  .fitb-result {
-    margin-top: 1rem;
-    padding: 1rem 1.5rem;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    display: none;
-  }
-  .fitb-result.show { display: block; }
-  .fitb-result.good { background: rgba(45,106,79,0.1); color: var(--correct); }
-  .fitb-result.bad { background: rgba(193,18,31,0.08); color: var(--wrong); }
-
-  /* ── MCQ ── */
-  .mcq-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .mcq-counter {
-    font-size: 0.85rem;
-    color: var(--ink-faint);
-    font-weight: 500;
-  }
-  .mcq-score-badge {
-    background: var(--ink);
-    color: var(--bg);
-    font-size: 0.85rem;
-    font-weight: 700;
-    padding: 4px 14px;
-    border-radius: 99px;
-  }
-
-  .question-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 2rem;
-    box-shadow: var(--shadow);
-    margin-bottom: 1rem;
-  }
-  .question-card .q-num {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    margin-bottom: 0.5rem;
-  }
-  .question-card .q-text {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.15rem;
-    font-weight: 700;
-    line-height: 1.4;
-    margin-bottom: 1.25rem;
-  }
-
-  .options { display: flex; flex-direction: column; gap: 0.6rem; }
-  .option-btn {
-    padding: 0.85rem 1.25rem;
-    border-radius: var(--radius-sm);
-    border: 2px solid rgba(26,21,16,0.1);
-    background: var(--bg);
-    text-align: left;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
+  .header-actions {
     display: flex;
     align-items: center;
     gap: 0.75rem;
   }
-  .option-btn:hover:not(:disabled) { border-color: var(--ink-soft); background: var(--surface2); }
-  .option-btn .opt-letter {
-    width: 24px; height: 24px;
+
+  .theme-toggle {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background: var(--surface2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    flex-shrink: 0;
-    transition: all 0.2s;
-  }
-  .option-btn.correct { border-color: var(--correct); background: rgba(45,106,79,0.08); }
-  .option-btn.correct .opt-letter { background: var(--correct); color: #fff; }
-  .option-btn.wrong { border-color: var(--wrong); background: rgba(193,18,31,0.06); }
-  .option-btn.wrong .opt-letter { background: var(--wrong); color: #fff; }
-  .option-btn:disabled { cursor: default; }
-
-  .q-feedback {
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-    font-weight: 500;
-    display: none;
-  }
-  .q-feedback.show { display: block; }
-  .q-feedback.correct-fb { background: rgba(45,106,79,0.1); color: var(--correct); }
-  .q-feedback.wrong-fb { background: rgba(193,18,31,0.08); color: var(--wrong); }
-
-  .mcq-nav {
+    cursor: pointer;
     display: flex;
-    gap: 1rem;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-top: 1rem;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: all var(--transition);
   }
 
-  .result-screen {
-    background: var(--surface);
+  .theme-toggle:hover { background: var(--border); }
+
+  /* ===== LAYOUT ===== */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  /* ===== SECTION CARDS ===== */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 3rem 2rem;
-    box-shadow: var(--shadow-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-label {
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title {
+    font-family: var(--font-head);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    line-height: 1.3;
+  }
+
+  /* ===== TEXTAREA ===== */
+  textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 1rem 1.25rem;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    resize: vertical;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+
+  textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(192,57,43,0.12);
+  }
+
+  /* ===== CONTROLS ROW ===== */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    align-items: center;
+  }
+
+  .blank-count-label {
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .blank-count-label input[type="range"] {
+    accent-color: var(--accent);
+    width: 90px;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.55rem 1.2rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: 0.01em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(192,57,43,0.25);
+  }
+
+  .btn-primary:hover {
+    background: #a93226;
+    box-shadow: 0 4px 14px rgba(192,57,43,0.35);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: var(--bg-input);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: var(--border);
+    transform: translateY(-1px);
+  }
+
+  .btn-success {
+    background: var(--correct);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(39,174,96,0.25);
+  }
+
+  .btn-success:hover {
+    background: #219a52;
+    transform: translateY(-1px);
+  }
+
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+  /* ===== QUIZ PASSAGE AREA ===== */
+  #quiz-section { display: none; }
+
+  .passage-display {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.95;
+    color: var(--text);
+  }
+
+  /* Paragraphs inside passage */
+  .passage-display p {
+    margin-bottom: 1.1em;
+  }
+
+  /* Blank input fields */
+  .blank-input {
+    display: inline-block;
+    border: none;
+    border-bottom: 2px solid var(--accent);
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    width: 110px;
+    text-align: center;
+    outline: none;
+    padding: 0 4px 1px;
+    margin: 0 3px;
+    transition: border-color var(--transition), background var(--transition);
+    vertical-align: baseline;
+  }
+
+  .blank-input:focus {
+    border-bottom-color: var(--accent-2);
+    background: rgba(230,126,34,0.06);
+    border-radius: 3px 3px 0 0;
+  }
+
+  .blank-input.correct {
+    border-bottom-color: var(--correct);
+    color: var(--correct);
+    background: rgba(39,174,96,0.07);
+    border-radius: 3px 3px 0 0;
+  }
+
+  .blank-input.wrong {
+    border-bottom-color: var(--wrong);
+    color: var(--wrong);
+    background: rgba(192,57,43,0.07);
+    border-radius: 3px 3px 0 0;
+  }
+
+  .correct-hint {
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    color: var(--wrong);
+    margin-left: 2px;
+    font-style: italic;
+  }
+
+  .blank-input.revealed {
+    border-bottom-color: var(--accent-2);
+    color: var(--accent-2);
+    font-style: italic;
+    background: rgba(230,126,34,0.08);
+    border-radius: 3px 3px 0 0;
+  }
+
+  /* ===== SCORE CARD ===== */
+  #score-panel {
+    display: none;
+    animation: fadeUp 0.35s ease both;
+  }
+
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .score-stat {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
     text-align: center;
   }
-  .result-screen .score-big {
-    font-family: 'Playfair Display', serif;
-    font-size: 5rem;
-    font-weight: 900;
+
+  .score-stat .number {
+    font-family: var(--font-head);
+    font-size: 2.2rem;
+    font-weight: 700;
     line-height: 1;
     margin-bottom: 0.25rem;
   }
-  .result-screen .score-big span { color: var(--gold); }
-  .result-screen .score-sub { color: var(--ink-faint); margin-bottom: 1rem; }
-  .result-screen .result-msg {
-    font-size: 1.15rem;
-    font-weight: 600;
+
+  .score-stat .label {
+    font-family: var(--font-ui);
+    font-size: 0.73rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .score-stat.correct-stat .number { color: var(--correct); }
+  .score-stat.wrong-stat   .number { color: var(--wrong); }
+  .score-stat.pct-stat     .number { color: var(--accent-2); }
+
+  /* Progress bar */
+  .progress-bar-wrap {
+    background: var(--border);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
     margin-bottom: 1.5rem;
   }
 
-  /* ── MCQ GRID ── */
-  .mcq-dots {
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .score-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 1.5rem;
-    justify-content: center;
-  }
-  .mcq-dot {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 2px solid transparent;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--ink-faint);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .mcq-dot.answered-correct { background: var(--correct); color: #fff; }
-  .mcq-dot.answered-wrong { background: var(--wrong); color: #fff; }
-  .mcq-dot.current { border-color: var(--ink); color: var(--ink); }
-
-  /* ── NAVIGATION FOOTER ── */
-  .nav-footer {
-    display: flex;
-    gap: 1rem;
-    justify-content: space-between;
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(26,21,16,0.08);
+    gap: 0.6rem;
   }
 
+  /* ===== DIVIDER ===== */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.5rem 0;
+  }
+
+  /* ===== NOTICE / EMPTY STATE ===== */
+  .notice {
+    font-family: var(--font-ui);
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 2rem;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 600px) {
+    main { padding: 1.5rem 1rem 4rem; }
+    .card { padding: 1.25rem; }
+    .score-grid { grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .score-stat .number { font-size: 1.6rem; }
+    .blank-input { width: 90px; }
+    .controls { flex-direction: column; align-items: flex-start; }
+    .blank-count-label { margin-left: 0; }
+  }
 </style>
 </head>
 <body>
 
+<!-- ===== HEADER ===== -->
 <header>
-  <div class="logo">Reading<span>Hub</span></div>
-  <div class="progress-wrap"><div class="progress-fill" id="globalProgress" style="width:0%"></div></div>
-  <div class="progress-label" id="progressLabel">Topic 1 of 3</div>
+  <div class="logo">Read<span>Fill</span></div>
+  <div class="header-actions">
+    <button class="theme-toggle" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode">☀️</button>
+  </div>
 </header>
 
-<nav class="topic-nav">
-  <button class="topic-btn active" data-topic="0" onclick="switchTopic(0)">
-    <span class="icon">🐬</span>Dolphins
-  </button>
-  <button class="topic-btn" data-topic="1" onclick="switchTopic(1)">
-    <span class="icon">🧠</span>Psychological Pressure
-  </button>
-  <button class="topic-btn" data-topic="2" onclick="switchTopic(2)">
-    <span class="icon">📱</span>Generation &amp; Technology
-  </button>
-</nav>
-
+<!-- ===== MAIN ===== -->
 <main>
 
-<!-- ═══════════════════════════════════════════════
-     TOPIC 0 — DOLPHINS
-═══════════════════════════════════════════════ -->
-<div class="topic-panel t0 active" id="topic-0">
-  <div class="section-tabs">
-    <button class="sec-btn active" onclick="switchSection(0,0)">📖 Summary</button>
-    <button class="sec-btn" onclick="switchSection(0,1)">✏️ Fill in the Blank</button>
-    <button class="sec-btn" onclick="switchSection(0,2)">❓ Quiz (20 Qs)</button>
-  </div>
-
-  <!-- SUMMARY -->
-  <div class="section-panel active" id="t0-s0">
-    <div class="summary-hero">
-      <div class="eyebrow">Reading 1</div>
-      <h1>Dolphins</h1>
-      <p>Exploring the intelligence, social behavior, and remarkable nature of one of the ocean's most fascinating creatures.</p>
-    </div>
-    <div class="summary-grid">
-      <div class="summary-card">
-        <h3>🌊 Reputation & History</h3>
-        <p>Dolphins have long been considered the friendliest creatures in the sea. Stories of dolphins rescuing or helping drowning sailors have been told since Roman times, showing that this reputation goes back thousands of years.</p>
-      </div>
-      <div class="summary-card">
-        <h3>🤝 Complex Social Behavior</h3>
-        <p>The more scientists study dolphins, the more they discover how socially sophisticated these animals truly are. Dolphins look after sick members of their group, care for pregnant mothers, and protect the weakest individuals — behaviors very similar to what humans do in their own communities.</p>
-      </div>
-      <div class="summary-card">
-        <h3>💬 Communication</h3>
-        <p>Some scientists have proposed that dolphins possess their own language. However, most experts believe it is more accurate to say that dolphins communicate with one another without relying on words as we know them. Their communication system is complex but fundamentally different from human language.</p>
-      </div>
-      <div class="summary-card">
-        <h3>🧠 Intelligence</h3>
-        <p>The reading raises a bold and thought-provoking question: could dolphins be more intelligent than humans? The author challenges the common argument that humans are superior because we can kill dolphins more easily than they can kill us — pointing out that this is actually a very poor measure of intelligence or worth.</p>
-      </div>
-      <div class="summary-card full">
-        <h3>⚖️ The Author's Main Message</h3>
-        <p>The writer argues that the more we learn about dolphins, the less superior we appear when we choose to harm or destroy them. Killing a creature does not prove our superiority — if anything, it may demonstrate the opposite. The passage ultimately calls on readers to respect these remarkable mammals.</p>
-        <div class="key-fact">Dolphins are mammals, not fish — they breathe air, give birth to live young, and nurse their babies.</div>
-        <div class="key-fact">The author uses irony: the "proof" of human superiority (our ability to kill them) actually makes us look worse, not better.</div>
-        <div class="key-fact">Dolphins' social structures — caring for the sick, the elderly, and the unborn — mirror some of humanity's most valued traits.</div>
+  <!-- STEP 1: Paste Passage -->
+  <div class="card" id="input-section">
+    <div class="section-label">Step 1</div>
+    <h2 class="section-title">Paste or edit a reading passage</h2>
+    <textarea id="passageInput" placeholder="Paste any English reading passage here…" spellcheck="false"></textarea>
+    <div class="controls">
+      <button class="btn btn-primary" id="generateBtn">⚡ Generate Quiz</button>
+      <button class="btn btn-secondary" id="newBlanksBtn" disabled>🔀 New Blank Selection</button>
+      <div class="blank-count-label">
+        Blanks: <strong id="blankCountDisplay">25</strong>
+        <input type="range" id="blankCount" min="5" max="40" value="25" />
       </div>
     </div>
   </div>
 
-  <!-- FILL IN THE BLANK -->
-  <div class="section-panel" id="t0-s1">
-    <div class="fitb-passage">
-      <p id="fitb-t0-passage"></p>
-    </div>
-    <div class="fitb-controls">
-      <button class="btn-primary" onclick="checkFitb(0)">Check Answers</button>
-      <button class="btn-secondary" onclick="resetFitb(0)">Reset</button>
-    </div>
-    <div class="fitb-result" id="fitb-result-0"></div>
-  </div>
-
-  <!-- MCQ -->
-  <div class="section-panel" id="t0-s2">
-    <div id="mcq-0"></div>
-  </div>
-
-  <div class="nav-footer">
-    <button class="btn-secondary" onclick="prevTopic()" id="prev-0" style="visibility:hidden">← Previous Topic</button>
-    <button class="btn-primary" onclick="nextTopic()">Next Topic →</button>
-  </div>
-</div>
-
-
-<!-- ═══════════════════════════════════════════════
-     TOPIC 1 — PSYCHOLOGICAL PRESSURE / STRESS
-═══════════════════════════════════════════════ -->
-<div class="topic-panel t1" id="topic-1">
-  <div class="section-tabs">
-    <button class="sec-btn active" onclick="switchSection(1,0)">📖 Summary</button>
-    <button class="sec-btn" onclick="switchSection(1,1)">✏️ Fill in the Blank</button>
-    <button class="sec-btn" onclick="switchSection(1,2)">❓ Quiz (20 Qs)</button>
-  </div>
-
-  <div class="section-panel active" id="t1-s0">
-    <div class="summary-hero">
-      <div class="eyebrow">Reading 2</div>
-      <h1>Psychological Pressure</h1>
-      <p>Understanding how stress affects the body, the emotions, and the mind — and why it is one of modern life's biggest health challenges.</p>
-    </div>
-    <div class="summary-grid">
-      <div class="summary-card">
-        <h3>😤 What Is Stress?</h3>
-        <p>The reading opens with a well-known English expression — "Stop the world, I want to get off!" — which captures the feeling of panic and overwhelming pressure that stress creates. Stress is defined simply as pressure or tension. It is one of the most widespread causes of health problems in modern life, affecting people physically, emotionally, and mentally.</p>
-      </div>
-      <div class="summary-card">
-        <h3>❤️ Physical Effects</h3>
-        <p>Stress has a wide range of physical consequences. It can affect the heart by increasing the pulse rate, causing missed heartbeats, and raising blood pressure. It can impact the respiratory system, leading to asthma or abnormally fast breathing which reduces carbon dioxide. It also disrupts digestion, causing stomach aches and difficulty processing food properly.</p>
-      </div>
-      <div class="summary-card">
-        <h3>😟 Emotional Effects</h3>
-        <p>People under stress often feel anxious, tired, and irritable. They may experience panic attacks. Stress tends to make people overreact disproportionately to small, everyday problems. A parent who is normally calm and gentle might shout at a child over something trivial — like spilling juice — simply because the pressure of work has made them emotionally fragile.</p>
-      </div>
-      <div class="summary-card">
-        <h3>🏥 Long-term Mental Effects</h3>
-        <p>If stress continues over a long period without treatment, it can lead to serious mental illness. Depression — an extreme and prolonged feeling of sadness and hopelessness — can result from chronic stress. People may also turn to alcohol or drugs as a way of coping, leading to addiction. Eating disorders such as anorexia are sometimes caused by stress and are almost always made worse by it.</p>
-      </div>
-      <div class="summary-card full">
-        <h3>💡 The Author's Conclusion</h3>
-        <p>The writer concludes by summarizing the three-layered danger of stress: it attacks the body, disrupts the emotions, and — if left untreated — eventually threatens mental health. The final advice is clear and even a little playful: reduce stress by "stopping the world" and resting for a while. The message is that managing stress is not a luxury — it is essential for overall well-being.</p>
-        <div class="key-fact">Stress affects the heart, lungs, and stomach — three of the body's most vital systems.</div>
-        <div class="key-fact">Alcoholism and eating disorders like anorexia can both be results of long-term unmanaged stress.</div>
-        <div class="key-fact">The article title "Stop the world, I want to get off!" is a metaphor for feeling overwhelmed by life's pace.</div>
-      </div>
+  <!-- STEP 2: Quiz -->
+  <div class="card" id="quiz-section">
+    <div class="section-label">Step 2 — Fill in the Blanks</div>
+    <h2 class="section-title" id="quiz-title">Reading Quiz</h2>
+    <div class="divider"></div>
+    <div class="passage-display" id="passageDisplay"></div>
+    <div class="divider"></div>
+    <div class="controls">
+      <button class="btn btn-success" id="checkBtn">✓ Check Answers</button>
+      <button class="btn btn-secondary" id="showBtn">👁 Show Answers</button>
+      <button class="btn btn-secondary" id="resetBtn">↺ Reset Quiz</button>
     </div>
   </div>
 
-  <div class="section-panel" id="t1-s1">
-    <div class="fitb-passage">
-      <p id="fitb-t1-passage"></p>
-    </div>
-    <div class="fitb-controls">
-      <button class="btn-primary" onclick="checkFitb(1)">Check Answers</button>
-      <button class="btn-secondary" onclick="resetFitb(1)">Reset</button>
-    </div>
-    <div class="fitb-result" id="fitb-result-1"></div>
-  </div>
-
-  <div class="section-panel" id="t1-s2">
-    <div id="mcq-1"></div>
-  </div>
-
-  <div class="nav-footer">
-    <button class="btn-secondary" onclick="prevTopic()">← Previous Topic</button>
-    <button class="btn-primary" onclick="nextTopic()">Next Topic →</button>
-  </div>
-</div>
-
-
-<!-- ═══════════════════════════════════════════════
-     TOPIC 2 — GENERATION & TECHNOLOGY
-═══════════════════════════════════════════════ -->
-<div class="topic-panel t2" id="topic-2">
-  <div class="section-tabs">
-    <button class="sec-btn active" onclick="switchSection(2,0)">📖 Summary</button>
-    <button class="sec-btn" onclick="switchSection(2,1)">✏️ Fill in the Blank</button>
-    <button class="sec-btn" onclick="switchSection(2,2)">❓ Quiz (20 Qs)</button>
-  </div>
-
-  <div class="section-panel active" id="t2-s0">
-    <div class="summary-hero">
-      <div class="eyebrow">Reading 3</div>
-      <h1>Generation &amp; Technology</h1>
-      <p>How different generations use social media and smartphones — and what happens when digital habits reshape real-life relationships.</p>
-    </div>
-    <div class="summary-grid">
-      <div class="summary-card">
-        <h3>👴 Grandparents Online</h3>
-        <p>Surprisingly, it is the older generation — those aged 55 and above — who are joining social media platforms like Facebook in rapidly growing numbers. In the UK, there are 3.5 million Facebook users aged 55–64 and 2.9 million over the age of 65. Sheila, aged 59, explains that she joined to watch videos and photos of her grandchildren shared by her daughter — a much richer connection than the old days of waiting for letters and photos by post.</p>
+  <!-- STEP 3: Score -->
+  <div class="card" id="score-panel">
+    <div class="section-label">Your Score</div>
+    <h2 class="section-title">Results</h2>
+    <div class="score-grid">
+      <div class="score-stat correct-stat">
+        <div class="number" id="correctCount">0</div>
+        <div class="label">Correct</div>
       </div>
-      <div class="summary-card">
-        <h3>👶 Teenagers Leaving Facebook</h3>
-        <p>Ironically, while grandparents are joining Facebook, teenagers are leaving it. Only 2.2 million UK users are under 17. However, young people are not disconnecting from technology — they are simply moving to other apps and devices. Fifteen-year-old Chloe even sleeps with her phone, using it as her alarm clock, and checks it the moment she wakes up and just before she falls asleep.</p>
+      <div class="score-stat wrong-stat">
+        <div class="number" id="wrongCount">0</div>
+        <div class="label">Wrong</div>
       </div>
-      <div class="summary-card">
-        <h3>🤝 Real Life vs. Screen Life</h3>
-        <p>The contrast between generations is striking. Teenagers are spending so much time on their phones at home that they are missing out on face-to-face time with friends. Meanwhile, Sheila has reconnected with old school friends she had not spoken to in forty years, using Facebook to organize in-person meetings across the country. For her, social media has entirely transformed her social life for the better.</p>
-      </div>
-      <div class="summary-card">
-        <h3>👨‍👧 Parents: The Early Adopters</h3>
-        <p>Peter, a 38-year-old father of two teenagers, represents the "middle generation" — the early adopters of smartphones who paved the way for their children's addiction. He admits he used to be constantly connected, always feeling like he was working. Concerned about setting a poor example, he now removes his SIM card on evenings and weekends, putting it into an old basic phone that can only call and send texts.</p>
-      </div>
-      <div class="summary-card full">
-        <h3>🔮 The Bigger Question</h3>
-        <p>The article ends with a thought-provoking question: will the generation above and below Peter — grandparents and teenagers — eventually follow his lead toward a less digital lifestyle? The piece challenges all readers to think about whether technology is genuinely enriching their relationships or quietly replacing them.</p>
-        <div class="key-fact">The over-55s will soon be Facebook's second biggest user group in the UK.</div>
-        <div class="key-fact">"Ironically" is a key word — grandparents use the platform their grandchildren have abandoned.</div>
-        <div class="key-fact">Peter's strategy: keeping one basic phone for emergencies shows it is possible to reduce screen time without being completely disconnected.</div>
+      <div class="score-stat pct-stat">
+        <div class="number" id="pctScore">0%</div>
+        <div class="label">Score</div>
       </div>
     </div>
-  </div>
-
-  <div class="section-panel" id="t2-s1">
-    <div class="fitb-passage">
-      <p id="fitb-t2-passage"></p>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
     </div>
-    <div class="fitb-controls">
-      <button class="btn-primary" onclick="checkFitb(2)">Check Answers</button>
-      <button class="btn-secondary" onclick="resetFitb(2)">Reset</button>
+    <div class="score-actions">
+      <button class="btn btn-secondary" id="resetBtn2">↺ Try Again</button>
+      <button class="btn btn-secondary" id="newBlanksBtn2">🔀 New Blank Selection</button>
     </div>
-    <div class="fitb-result" id="fitb-result-2"></div>
   </div>
-
-  <div class="section-panel" id="t2-s2">
-    <div id="mcq-2"></div>
-  </div>
-
-  <div class="nav-footer">
-    <button class="btn-secondary" onclick="prevTopic()">← Previous Topic</button>
-    <button class="btn-secondary" onclick="prevTopic()" id="next-2" style="visibility:hidden">Next Topic →</button>
-  </div>
-</div>
 
 </main>
 
 <script>
-// ════════════════════════════════════════════════════════════
-// DATA
-// ════════════════════════════════════════════════════════════
+/* =====================================================================
+   ReadFill — Core Logic
+   ===================================================================== */
 
-const FITB_DATA = [
-  // TOPIC 0 — DOLPHINS
-  {
-    segments: [
-      "Dolphins are regarded as the ",
-      { word: "friendliest", hint: "Starts with 'fr' — means most kind and welcoming (9 letters)" },
-      " creatures in the sea and stories of them helping ",
-      { word: "drowning", hint: "What happens when someone sinks in water (8 letters)" },
-      " sailors have been common since Roman times. The more we learn about dolphins, the more we realize that their ",
-      { word: "society", hint: "Another word for community or social group (7 letters)" },
-      " is more complex than people previously imagined. They look after other dolphins when they are ill, care for ",
-      { word: "pregnant", hint: "Describes a mother expecting a baby (8 letters)" },
-      " mothers and protect the ",
-      { word: "weakest", hint: "The opposite of strongest (7 letters)" },
-      " in the community, as we do. Some scientists have suggested that dolphins have a ",
-      { word: "language", hint: "A system of communication using words or sounds (8 letters)" },
-      " but it is much more probable that they ",
-      { word: "communicate", hint: "To share information with others (11 letters)" },
-      " with each other without needing words. On the contrary, the more we discover about these remarkable creatures, the less we appear ",
-      { word: "superior", hint: "Means better than others (8 letters)" },
-      " when we destroy them."
-    ]
-  },
-  // TOPIC 1 — STRESS
-  {
-    segments: [
-      "Too much stress results in physical, ",
-      { word: "emotional", hint: "Related to your feelings (9 letters)" },
-      ", and mental health problems. Stress can affect the heart. It can increase the ",
-      { word: "pulse", hint: "Your heartbeat rate (5 letters)" },
-      " rate, make the heart miss beats, and can cause high ",
-      { word: "blood pressure", hint: "A condition linked to heart health — two words" },
-      ". Stress can lead to ",
-      { word: "asthma", hint: "A breathing condition — starts with 'a' (6 letters)" },
-      ". It can cause a person to breathe too fast, resulting in a loss of important ",
-      { word: "carbon dioxide", hint: "A gas exhaled by humans — two words" },
-      ". People suffering from stress often feel ",
-      { word: "anxious", hint: "Feeling worried or nervous (7 letters)" },
-      ". Long-term stress can lead to ",
-      { word: "depression", hint: "An extreme and prolonged feeling of sadness (10 letters)" },
-      ", an extreme feeling of sadness and hopelessness. Eating disorders, such as ",
-      { word: "anorexia", hint: "A serious eating disorder starting with 'a' (8 letters)" },
-      ", are sometimes caused by stress."
-    ]
-  },
-  // TOPIC 2 — DIGITAL HABITS
-  {
-    segments: [
-      "Today's grandparents are joining their grandchildren on ",
-      { word: "social media", hint: "Platforms like Facebook and Instagram — two words" },
-      ", but the different generations' online habits couldn't be more different. In the UK the over-55s are joining Facebook in increasing ",
-      { word: "numbers", hint: "Another word for amounts or figures (7 letters)" },
-      ". Children under 17 in the UK are ",
-      { word: "leaving", hint: "The opposite of joining (7 letters)" },
-      " the site, but they're not going far from their ",
-      { word: "smartphones", hint: "Touch-screen mobile devices (11 letters)" },
-      ". Chloe's age group is spending so much time on their phones at home that they are missing out on spending time with their friends in ",
-      { word: "real life", hint: "The opposite of virtual life — two words" },
-      ". Teenagers might have their parents to thank for their smartphone and social media ",
-      { word: "addiction", hint: "An unhealthy dependency on something (9 letters)" },
-      " as their parents were the early ",
-      { word: "adopters", hint: "People who use something new first (8 letters)" },
-      " of the smartphone. Peter takes his SIM card out so that he is setting a better ",
-      { word: "example", hint: "A model of behavior for others to follow (7 letters)" },
-      " to his kids."
-    ]
-  }
-];
+/* ----- DEFAULT PASSAGE ----- */
+const DEFAULT_PASSAGE = `Dolphins
 
-const MCQ_DATA = [
-  // ── TOPIC 0: DOLPHINS ── 20 questions
-  [
-    { q: "According to the passage, dolphins are regarded as the _____ creatures in the sea.", opts: ["most dangerous","friendliest","largest","fastest"], ans: 1 },
-    { q: "Stories of dolphins helping drowning sailors have been common since _____ times.", opts: ["Medieval","Modern","Greek","Roman"], ans: 3 },
-    { q: "What does the passage say about dolphins' society?", opts: ["It is simple and primitive","It is more complex than previously imagined","It is exactly like human society","It is mysterious and unknown"], ans: 1 },
-    { q: "Dolphins look after other dolphins when they are _____.", opts: ["hungry","lost","ill","young"], ans: 2 },
-    { q: "According to the passage, dolphins protect the _____ in the community.", opts: ["oldest","largest","weakest","smartest"], ans: 2 },
-    { q: "Some scientists have suggested that dolphins _____ .", opts: ["are not intelligent","have a language","cannot communicate","are unfriendly"], ans: 1 },
-    { q: "The author finds it MORE probable that dolphins communicate _____ .", opts: ["using words similar to humans","without needing words","through visual signals only","by touching each other"], ans: 1 },
-    { q: "The most common argument for human superiority over dolphins is that humans _____ .", opts: ["are smarter","live longer","can kill dolphins more easily","have language"], ans: 2 },
-    { q: "The author considers the argument about killing dolphins to be _____ .", opts: ["very convincing","scientifically proven","the least satisfactory","morally acceptable"], ans: 2 },
-    { q: "What happens the more we discover about dolphins, according to the author?", opts: ["We feel more superior","We feel less superior when we destroy them","We feel equal to them","We become more afraid of them"], ans: 1 },
-    { q: "The word 'remarkable' in the passage is closest in meaning to _____.", opts: ["ordinary","extraordinary","dangerous","friendly"], ans: 1 },
-    { q: "Which of the following behaviors do dolphins and humans share according to the passage?", opts: ["Using language","Building homes","Protecting the weakest","Swimming together"], ans: 2 },
-    { q: "The passage suggests that dolphins are _____.", opts: ["less intelligent than fish","possibly more intelligent than humans","exactly as intelligent as humans","not intelligent at all"], ans: 1 },
-    { q: "Which statement is TRUE according to the passage?", opts: ["Dolphins have been proven to have a language","Stories of dolphins helping sailors began in modern times","Dolphins care for pregnant mothers","Dolphins are the fastest creatures in the sea"], ans: 2 },
-    { q: "The tone of the passage toward dolphins is best described as _____.", opts: ["indifferent","critical","admiring and respectful","fearful"], ans: 2 },
-    { q: "What does the passage imply about humans who destroy dolphins?", opts: ["They are proving their intelligence","They are fulfilling a natural role","They appear less superior, not more","They are protecting the ocean"], ans: 2 },
-    { q: "The word 'complex' in 'their society is more complex' means _____.", opts: ["simple","small","sophisticated","dangerous"], ans: 2 },
-    { q: "The phrase 'on the contrary' signals that the author is about to _____ .", opts: ["agree with the previous idea","give an example","present an opposing idea","summarize the passage"], ans: 2 },
-    { q: "Which phrase best captures the author's main argument?", opts: ["Dolphins are dangerous to humans","Killing dolphins proves our strength","Understanding dolphins reveals our own flaws when we harm them","Dolphins will eventually communicate like humans"], ans: 2 },
-    { q: "The word 'superior' means _____.", opts: ["below average","equal","better","similar"], ans: 2 },
-  ],
-  // ── TOPIC 1: STRESS ── 20 questions
-  [
-    { q: "The expression 'Stop the world, I want to get off!' refers to a feeling of _____.", opts: ["joy","excitement","panic and stress","boredom"], ans: 2 },
-    { q: "'Stress' is defined in the passage as _____.", opts: ["physical pain","pressure or tension","a mental illness","a type of exercise"], ans: 1 },
-    { q: "Stress is described as one of the most common causes of _____ in modern life.", opts: ["happiness","health problems","addiction","financial problems"], ans: 1 },
-    { q: "Which of the following is a physical effect of stress on the heart?", opts: ["It slows the pulse rate","It can cause high blood pressure","It strengthens the heart","It reduces blood flow to the brain"], ans: 1 },
-    { q: "Stress can affect the respiratory system by leading to _____.", opts: ["headaches","asthma","stomach aches","depression"], ans: 1 },
-    { q: "Breathing too fast due to stress results in a loss of important _____.", opts: ["oxygen","nitrogen","carbon dioxide","blood pressure"], ans: 2 },
-    { q: "Which body system does the passage NOT mention as being affected by stress?", opts: ["The heart","The stomach","The lungs","The arms"], ans: 3 },
-    { q: "People suffering from stress often feel _____.", opts: ["joyous and energetic","anxious and tired","calm and focused","confident and strong"], ans: 1 },
-    { q: "Which of the following is an example of emotional overreaction due to stress?", opts: ["A parent reading calmly","A parent yelling at a child for spilling juice","A student studying quietly","A worker taking a day off"], ans: 1 },
-    { q: "Stress can make people feel angry, moody, or _____.", opts: ["generous","nervous","confident","playful"], ans: 1 },
-    { q: "Depression is described in the passage as _____.", opts: ["a short feeling of sadness","a physical disease","an extreme feeling of sadness and hopelessness","a normal emotional response"], ans: 2 },
-    { q: "Alcoholism can develop from stress because _____.", opts: ["alcohol is cheap","people use alcohol to relieve stress","alcohol is healthy","doctors recommend alcohol"], ans: 1 },
-    { q: "Which eating disorder is mentioned as being sometimes caused by stress?", opts: ["Bulimia","Obesity","Anorexia","Diabetes"], ans: 2 },
-    { q: "According to the passage, if stress is allowed to continue, _____ is put at risk.", opts: ["physical fitness","financial security","one's mental health","social relationships"], ans: 2 },
-    { q: "The passage says stress has a great influence on the health of our bodies, our feelings, and our _____.", opts: ["careers","relationships","minds","finances"], ans: 2 },
-    { q: "The word 'numerous' in 'There are numerous physical effects' means _____.", opts: ["few","some","many","unknown"], ans: 2 },
-    { q: "The phrase 'result in' means _____.", opts: ["cause","prevent","describe","reduce"], ans: 0 },
-    { q: "Which of the following is NOT caused by long-term stress according to the passage?", opts: ["Depression","Alcoholism","Anorexia","Bloating"], ans: 3 },
-    { q: "The author's final advice in the passage is to _____.", opts: ["work harder","take medication","reduce stress and rest","see a doctor immediately"], ans: 2 },
-    { q: "The word 'eventually' in 'it may eventually result in mental illness' means _____.", opts: ["immediately","never","at some point in the future","quickly"], ans: 2 },
-  ],
-  // ── TOPIC 2: DIGITAL HABITS ── 20 questions
-  [
-    { q: "Who is joining Facebook in increasing numbers in the UK?", opts: ["Teenagers under 17","Children aged 10–14","People aged 55 and over","University students"], ans: 2 },
-    { q: "How many Facebook users in the UK are aged 55–64?", opts: ["2.2 million","2.9 million","3.5 million","4.1 million"], ans: 2 },
-    { q: "Why did Sheila join Facebook?", opts: ["To find a job","To watch videos of her grandchildren","To follow celebrities","To read the news"], ans: 1 },
-    { q: "How did Sheila's family stay connected when she was a child?", opts: ["By telephone","By email","By letters and photos in the post","By visiting in person"], ans: 2 },
-    { q: "Why is it ironic that grandparents are joining Facebook?", opts: ["They are too old for technology","Their grandchildren are leaving the site","Facebook is too expensive for them","They prefer other platforms"], ans: 1 },
-    { q: "How many UK users of Facebook are under 17?", opts: ["2.9 million","3.5 million","1.5 million","2.2 million"], ans: 3 },
-    { q: "Why does Chloe sleep with her phone?", opts: ["She uses it to watch movies","It is her alarm clock","She is afraid of the dark","She chats with friends all night"], ans: 1 },
-    { q: "What are teenagers missing out on by spending too much time on their phones?", opts: ["Sleep","Exercise","Face-to-face time with friends","Schoolwork"], ans: 2 },
-    { q: "How has Facebook changed Sheila's life?", opts: ["She found a new job","She reconnected with old friends from school","She learned to use computers","She moved to a new city"], ans: 1 },
-    { q: "Who are described as the 'early adopters' of smartphones?", opts: ["Teenagers","Grandparents","Parents in their 30s","Children under 10"], ans: 2 },
-    { q: "What does Peter do on evenings and weekends to limit his phone use?", opts: ["He turns his phone off completely","He gives it to his children","He removes his SIM card and uses a basic phone","He deletes his social media apps"], ans: 2 },
-    { q: "What can Peter's basic phone do?", opts: ["Everything a smartphone does","Only make calls and send texts","Only connect to the internet","Only play music"], ans: 1 },
-    { q: "Why does Peter still keep a basic phone rather than no phone at all?", opts: ["It is cheaper","He needs it for work","In case of emergencies","His children need to call him"], ans: 2 },
-    { q: "What is the main reason Peter changed his phone habits?", opts: ["He lost his smartphone","He wanted to save money","He wanted to set a better example for his children","His employer told him to"], ans: 2 },
-    { q: "The word 'ironically' in the passage suggests _____.", opts: ["something sad happened","something happened that was unexpected or contrary to what might be expected","something was planned carefully","something was done quickly"], ans: 1 },
-    { q: "The word 'addiction' in the passage means _____.", opts: ["a healthy habit","a technical skill","an unhealthy dependence on something","a type of technology"], ans: 2 },
-    { q: "The phrase 'missing out on' means _____.", opts: ["losing money","not getting the benefit of something","forgetting something","avoiding danger"], ans: 1 },
-    { q: "What does the article suggest about the different generations' online habits?", opts: ["They are exactly the same","They are completely opposite to what you might expect","They are all becoming less digital","Grandparents use phones more than teenagers"], ans: 1 },
-    { q: "The article ends by asking whether other generations will follow which trend?", opts: ["Joining more social media platforms","Using faster smartphones","Moving toward a less digital life","Buying newer technology"], ans: 2 },
-    { q: "What is the central theme of the article?", opts: ["The history of the internet","How social media affects health","How different generations use technology in very different ways","Why teenagers are better at technology than adults"], ans: 2 },
-  ]
-];
+Dolphins are regarded as the friendliest creatures in the sea and stories of them helping drowning sailors have been common since Roman times. The more we learn about dolphins, the more we realize that their society is more complex than people previously imagined. They look after other dolphins when they are ill, care for pregnant mothers and protect the weakest in the community, as we do. Some scientists have suggested that dolphins have a language but it is much more probable that they communicate with each other without needing words. Could any of these mammals be more intelligent than man? Certainly the most common argument in favor of man's superiority over them that we can kill them more easily than they can kill us is the least satisfactory. On the contrary, the more we discover about these remarkable creatures, the less we appear superior when we destroy them.
 
-// ════════════════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════════════════
-let currentTopic = 0;
-let currentSections = [0, 0, 0];
-const mcqState = [
-  { current: 0, answers: new Array(20).fill(null), submitted: new Array(20).fill(false) },
-  { current: 0, answers: new Array(20).fill(null), submitted: new Array(20).fill(false) },
-  { current: 0, answers: new Array(20).fill(null), submitted: new Array(20).fill(false) },
-];
+The Effects of Stress
 
-// ════════════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════════════
-window.onload = () => {
-  [0,1,2].forEach(t => {
-    buildFitb(t);
-    buildMcq(t);
-  });
-  updateProgress();
+There is a famous expression in English: "Stop the world, I want to get off!" This expression refers to a feeling of panic, or stress, that makes a person want to stop whatever they are doing, try to relax, and become calm again. Stress means pressure or tension. It is one of the most common causes of health problems in modern life. Too much stress results in physical, emotional, and mental health problems.
+
+There are numerous physical effects of stress. Stress can affect the heart. It can increase the pulse rate, make the heart miss beats, and can cause high blood pressure. Stress can affect the respiratory system. It can lead to asthma. Emotions are also easily affected by stress. People suffering from stress often feel anxious. They may have panic attacks. They may feel tired all the time. Long-term stress can lead to a variety of serious mental illnesses. Depression, an extreme feeling of sadness and hopelessness, can be the result of continued and increasing stress. Alcoholism and other addictions often develop as a result of overuse of alcohol or drugs to try to relieve stress.`;
+
+/* ----- STOP WORDS (words never removed as blanks) ----- */
+const STOP_WORDS = new Set([
+  // Articles
+  'a','an','the',
+  // Prepositions
+  'in','on','at','by','for','with','about','against','between','into',
+  'through','during','before','after','above','below','to','from','up',
+  'down','out','off','over','under','again','further','then','once',
+  'of','about','as','into','through','during','including','until',
+  'against','nor','but','or','yet','so','although','because','since',
+  'while','whether','though','where','when','which','that','who','whom',
+  // Pronouns
+  'i','me','my','myself','we','our','ours','ourselves','you','your',
+  'yours','yourself','yourselves','he','him','his','himself','she','her',
+  'hers','herself','it','its','itself','they','them','their','theirs',
+  'themselves','what','who','which','this','that','these','those',
+  // Helping verbs
+  'am','is','are','was','were','be','been','being','have','has','had',
+  'do','does','did','will','would','shall','should','may','might',
+  'must','can','could','ought','need','dare','used',
+  // Common tiny words
+  'not','no','nor','so','yet','both','either','each','few','more',
+  'most','other','some','such','than','too','very','just','any','all',
+  'also','only','same','even','there','here','how','if','get','got',
+  'make','made','like','time','much','many','now',
+]);
+
+/* ----- SYNONYM DICTIONARY ----- */
+/* Add more entries freely — each key maps to an array of accepted synonyms */
+const SYNONYMS = {
+  happy:        ['glad','joyful','pleased','content','cheerful','delighted'],
+  sad:          ['unhappy','sorrowful','miserable','dejected','downcast'],
+  big:          ['large','huge','enormous','vast','great','giant'],
+  small:        ['little','tiny','miniature','petite','minor'],
+  smart:        ['intelligent','clever','bright','brilliant','wise'],
+  intelligent:  ['smart','clever','bright','brilliant','gifted'],
+  difficult:    ['hard','tough','challenging','demanding'],
+  easy:         ['simple','effortless','straightforward','uncomplicated'],
+  fast:         ['quick','rapid','swift','speedy','hasty'],
+  slow:         ['sluggish','unhurried','gradual','leisurely'],
+  start:        ['begin','commence','initiate','launch','open'],
+  end:          ['finish','conclude','stop','terminate','close','complete'],
+  afraid:       ['scared','frightened','fearful','terrified'],
+  angry:        ['mad','furious','irate','annoyed','outraged'],
+  beautiful:    ['pretty','lovely','attractive','gorgeous','stunning'],
+  show:         ['display','present','reveal','demonstrate','exhibit'],
+  help:         ['assist','aid','support','facilitate'],
+  important:    ['significant','crucial','vital','essential','key'],
+  common:       ['frequent','widespread','prevalent','ordinary','usual'],
+  complex:      ['complicated','intricate','involved','elaborate'],
+  suggest:      ['propose','recommend','indicate','imply'],
+  protect:      ['defend','guard','shield','safeguard'],
+  discover:     ['find','uncover','detect','identify','locate'],
+  remarkable:   ['extraordinary','outstanding','notable','exceptional'],
+  communicate:  ['convey','express','interact','correspond'],
+  affect:       ['impact','influence','alter','change'],
+  cause:        ['produce','create','generate','trigger','lead to'],
+  increase:     ['raise','boost','grow','rise','elevate'],
+  result:       ['outcome','consequence','effect','product'],
+  serious:      ['severe','grave','significant','critical'],
+  develop:      ['grow','form','emerge','evolve','advance'],
+  extreme:      ['severe','intense','drastic','radical'],
+  continue:     ['persist','proceed','maintain','sustain'],
+  relieve:      ['ease','reduce','alleviate','lessen','soothe'],
+  famous:       ['well-known','renowned','celebrated','noted','prominent'],
+  superior:     ['better','greater','higher','advanced'],
+  society:      ['community','civilization','culture','world'],
+  language:     ['tongue','speech','communication','dialect'],
+  creature:     ['animal','beast','organism','being'],
+  pressure:     ['stress','strain','tension','burden'],
+  emotional:    ['psychological','mental','feeling','affective'],
+  physical:     ['bodily','corporeal','material','tangible'],
 };
 
-// ════════════════════════════════════════════════════════════
-// TOPIC NAVIGATION
-// ════════════════════════════════════════════════════════════
-function switchTopic(idx) {
-  document.querySelectorAll('.topic-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('topic-' + idx).classList.add('active');
-  document.querySelector('[data-topic="' + idx + '"]').classList.add('active');
-  currentTopic = idx;
-  updateProgress();
-}
+/* ----- STATE ----- */
+let currentBlanks  = [];   // [{index, word, token}]
+let currentTokens  = [];   // array of token objects
+let passageText    = '';
 
-function nextTopic() {
-  if (currentTopic < 2) switchTopic(currentTopic + 1);
-}
-function prevTopic() {
-  if (currentTopic > 0) switchTopic(currentTopic - 1);
-}
-
-function updateProgress() {
-  const pct = ((currentTopic + 1) / 3) * 100;
-  document.getElementById('globalProgress').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = 'Topic ' + (currentTopic + 1) + ' of 3';
-}
-
-// ════════════════════════════════════════════════════════════
-// SECTION NAVIGATION
-// ════════════════════════════════════════════════════════════
-function switchSection(topic, section) {
-  const panel = document.getElementById('topic-' + topic);
-  panel.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
-  panel.querySelectorAll('.sec-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('t' + topic + '-s' + section).classList.add('active');
-  panel.querySelectorAll('.sec-btn')[section].classList.add('active');
-  currentSections[topic] = section;
-}
-
-// ════════════════════════════════════════════════════════════
-// FILL IN THE BLANK
-// ════════════════════════════════════════════════════════════
-function buildFitb(topicIdx) {
-  const data = FITB_DATA[topicIdx];
-  const container = document.getElementById('fitb-t' + topicIdx + '-passage');
-  let html = '';
-  let blankIdx = 0;
-
-  data.segments.forEach(seg => {
-    if (typeof seg === 'string') {
-      html += seg;
+/* ----- TOKENIZER ----- */
+/* Splits text into tokens preserving punctuation and whitespace */
+function tokenize(text) {
+  const tokens = [];
+  // Match words (including apostrophes), whitespace sequences, or single punctuation chars
+  const re = /([A-Za-z][A-Za-z'']*)|(\s+)|([^A-Za-z\s])/g;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    if (m[1] !== undefined) {
+      tokens.push({ type: 'word', raw: m[0], lower: m[0].toLowerCase() });
+    } else if (m[2] !== undefined) {
+      tokens.push({ type: 'space', raw: m[0] });
     } else {
-      const id = 't' + topicIdx + '_blank_' + blankIdx;
-      const hint = seg.hint;
-      const wordLen = seg.word.replace(/ /g, '').length;
-      html += `<span class="blank-wrap">
-        <input class="blank-input" id="${id}" type="text" autocomplete="off" spellcheck="false"
-          data-answer="${seg.word.toLowerCase()}" placeholder="${'_'.repeat(Math.min(wordLen,10))}" style="width:${Math.max(70, wordLen*10)}px">
-        <button class="hint-btn" onclick="showHint(this, '${hint.replace(/'/g,"\\'")}')">Hint</button>
-        <span class="hint-text" id="${id}_hint"></span>
-      </span>`;
-      blankIdx++;
+      tokens.push({ type: 'punct', raw: m[0] });
     }
-  });
-
-  container.innerHTML = html;
+  }
+  return tokens;
 }
 
-function showHint(btn, hint) {
-  const hintEl = btn.nextElementSibling;
-  hintEl.textContent = '💡 ' + hint;
-  hintEl.classList.add('visible');
-  btn.textContent = 'Hint ✓';
-  btn.disabled = true;
+/* ----- CANDIDATE SELECTOR ----- */
+/*
+  Picks `count` word-tokens to blank:
+  - skips stop words and very short words (≤2 chars)
+  - avoids consecutive blanked words
+  - distributes evenly across the passage
+  - avoids repeating the same word form more than twice
+*/
+function selectBlanks(tokens, count) {
+  // Collect eligible word indices
+  const eligible = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (t.type !== 'word') continue;
+    if (t.lower.length <= 2) continue;
+    if (STOP_WORDS.has(t.lower)) continue;
+    eligible.push(i);
+  }
+
+  if (eligible.length === 0) return [];
+
+  count = Math.min(count, Math.floor(eligible.length * 0.65));
+
+  // Divide eligible pool into `count` segments and pick one randomly from each
+  const segSize = eligible.length / count;
+  const chosen  = new Set();
+  const wordFreq = {};
+
+  for (let s = 0; s < count; s++) {
+    const segStart = Math.floor(s * segSize);
+    const segEnd   = Math.floor((s + 1) * segSize);
+    const candidates = eligible.slice(segStart, segEnd);
+
+    // Shuffle candidates within segment
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+
+    // Pick first that isn't adjacent to an already-chosen index and not over-used
+    for (const idx of candidates) {
+      const word = tokens[idx].lower;
+      const freq = wordFreq[word] || 0;
+      const adjacentChosen = chosen.has(idx - 1) || chosen.has(idx + 1) ||
+                             chosen.has(idx - 2) || chosen.has(idx + 2);
+      if (!adjacentChosen && freq < 2) {
+        chosen.add(idx);
+        wordFreq[word] = freq + 1;
+        break;
+      }
+    }
+  }
+
+  return [...chosen].sort((a, b) => a - b);
 }
 
-function checkFitb(topicIdx) {
-  const inputs = document.querySelectorAll(`#fitb-t${topicIdx}-passage .blank-input`);
-  let correct = 0;
+/* ----- BUILD QUIZ HTML ----- */
+function buildQuizHTML(tokens, blankIndices) {
+  const blankSet = new Set(blankIndices);
+  let html = '';
+  let blankNum = 0;
+
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (t.type === 'space') {
+      // Convert newlines to paragraph breaks
+      if (t.raw.includes('\n\n') || (t.raw.match(/\n/g) || []).length >= 2) {
+        html += '</p><p>';
+      } else if (t.raw.includes('\n')) {
+        html += ' ';
+      } else {
+        html += t.raw;
+      }
+    } else if (t.type === 'punct') {
+      html += escapeHTML(t.raw);
+    } else if (blankSet.has(i)) {
+      // Blank field
+      const wordLen = t.raw.length;
+      const w = Math.max(70, Math.min(140, wordLen * 12 + 30));
+      html += `<input
+        type="text"
+        class="blank-input"
+        data-index="${blankNum}"
+        data-answer="${escapeAttr(t.raw)}"
+        style="width:${w}px"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        aria-label="Blank ${blankNum + 1}"
+      />`;
+      blankNum++;
+    } else {
+      html += escapeHTML(t.raw);
+    }
+  }
+  return '<p>' + html + '</p>';
+}
+
+/* ----- SYNONYM CHECKER ----- */
+/* Returns true if `attempt` is an accepted answer for `correct` */
+function isAccepted(attempt, correct) {
+  const a = attempt.trim().toLowerCase();
+  const c = correct.toLowerCase();
+  if (a === c) return true;
+
+  // Check synonyms in both directions
+  const synForCorrect = SYNONYMS[c] || [];
+  if (synForCorrect.includes(a)) return true;
+
+  // Check if `a` is a key whose synonyms include `c`
+  const synForAttempt = SYNONYMS[a] || [];
+  if (synForAttempt.includes(c)) return true;
+
+  return false;
+}
+
+/* ----- CHECK ANSWERS ----- */
+function checkAnswers() {
+  const inputs = document.querySelectorAll('.blank-input');
+  let correct = 0, wrong = 0;
+
   inputs.forEach(inp => {
-    const userVal = inp.value.trim().toLowerCase();
-    const correctVal = inp.dataset.answer;
-    inp.classList.remove('correct', 'wrong');
-    if (userVal === correctVal) {
+    const answer  = inp.dataset.answer;
+    const attempt = inp.value;
+
+    // Remove any existing hint
+    const nextSib = inp.nextElementSibling;
+    if (nextSib && nextSib.classList.contains('correct-hint')) {
+      nextSib.remove();
+    }
+
+    if (!attempt.trim()) {
+      inp.classList.remove('correct', 'wrong');
+      return;
+    }
+
+    if (isAccepted(attempt, answer)) {
       inp.classList.add('correct');
+      inp.classList.remove('wrong');
       correct++;
     } else {
       inp.classList.add('wrong');
+      inp.classList.remove('correct');
+      wrong++;
+      // Show correct answer hint
+      const hint = document.createElement('span');
+      hint.className = 'correct-hint';
+      hint.textContent = `(${answer})`;
+      inp.insertAdjacentElement('afterend', hint);
     }
   });
-  const total = inputs.length;
-  const resultEl = document.getElementById('fitb-result-' + topicIdx);
-  resultEl.classList.remove('good', 'bad');
-  resultEl.classList.add('show');
-  if (correct === total) {
-    resultEl.classList.add('good');
-    resultEl.textContent = `🎉 Perfect! You got all ${total} blanks correct!`;
-  } else {
-    resultEl.classList.add('bad');
-    resultEl.textContent = `You got ${correct} out of ${total} correct. Check the red ones and try again!`;
-  }
+
+  // Count blanks with an answer entered
+  let answered = 0;
+  inputs.forEach(inp => { if (inp.value.trim()) answered++; });
+
+  showScore(correct, wrong, answered, inputs.length);
 }
 
-function resetFitb(topicIdx) {
-  const inputs = document.querySelectorAll(`#fitb-t${topicIdx}-passage .blank-input`);
-  inputs.forEach(inp => {
-    inp.value = '';
+/* ----- SHOW ANSWERS ----- */
+function showAnswers() {
+  document.querySelectorAll('.blank-input').forEach(inp => {
+    const nextSib = inp.nextElementSibling;
+    if (nextSib && nextSib.classList.contains('correct-hint')) nextSib.remove();
+    inp.value = inp.dataset.answer;
     inp.classList.remove('correct', 'wrong');
-  });
-  document.getElementById('fitb-result-' + topicIdx).classList.remove('show');
-
-  // reset hints
-  document.querySelectorAll(`#fitb-t${topicIdx}-passage .hint-btn`).forEach(b => {
-    b.textContent = 'Hint';
-    b.disabled = false;
-  });
-  document.querySelectorAll(`#fitb-t${topicIdx}-passage .hint-text`).forEach(h => {
-    h.classList.remove('visible');
+    inp.classList.add('revealed');
+    inp.disabled = true;
   });
 }
 
-// ════════════════════════════════════════════════════════════
-// MCQ
-// ════════════════════════════════════════════════════════════
-function buildMcq(t) {
-  renderMcqQuestion(t);
+/* ----- RESET QUIZ ----- */
+function resetQuiz() {
+  document.querySelectorAll('.blank-input').forEach(inp => {
+    inp.value = '';
+    inp.classList.remove('correct', 'wrong', 'revealed');
+    inp.disabled = false;
+    const nextSib = inp.nextElementSibling;
+    if (nextSib && nextSib.classList.contains('correct-hint')) nextSib.remove();
+  });
+  hideScore();
 }
 
-function renderMcqQuestion(t) {
-  const container = document.getElementById('mcq-' + t);
-  const state = mcqState[t];
-  const questions = MCQ_DATA[t];
-  const q = state.current;
-  const data = questions[q];
-  const score = state.answers.filter((a, i) => a === questions[i].ans).length;
-  const answered = state.submitted.filter(Boolean).length;
+/* ----- SHOW / HIDE SCORE ----- */
+function showScore(correct, wrong, answered, total) {
+  const pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  document.getElementById('correctCount').textContent = correct;
+  document.getElementById('wrongCount').textContent   = wrong;
+  document.getElementById('pctScore').textContent     = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+  const panel = document.getElementById('score-panel');
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 
-  // Dots
-  let dotsHtml = '<div class="mcq-dots">';
-  for (let i = 0; i < 20; i++) {
-    let cls = 'mcq-dot';
-    if (i === q) cls += ' current';
-    if (state.submitted[i]) {
-      cls += state.answers[i] === questions[i].ans ? ' answered-correct' : ' answered-wrong';
-    }
-    dotsHtml += `<div class="${cls}" onclick="goToQuestion(${t},${i})">${i+1}</div>`;
+function hideScore() {
+  document.getElementById('score-panel').style.display = 'none';
+}
+
+/* ----- GENERATE QUIZ ----- */
+function generateQuiz(reusePassage = false) {
+  if (!reusePassage) {
+    passageText = document.getElementById('passageInput').value.trim();
   }
-  dotsHtml += '</div>';
+  if (!passageText) {
+    alert('Please paste a reading passage first.');
+    return;
+  }
 
-  let optionsHtml = '';
-  const letters = ['A','B','C','D'];
-  data.opts.forEach((opt, i) => {
-    let cls = 'option-btn';
-    if (state.submitted[q]) {
-      if (i === data.ans) cls += ' correct';
-      else if (i === state.answers[q] && state.answers[q] !== data.ans) cls += ' wrong';
-    }
-    const disabled = state.submitted[q] ? 'disabled' : '';
-    optionsHtml += `<button class="${cls}" ${disabled} onclick="selectAnswer(${t},${i})">
-      <span class="opt-letter">${letters[i]}</span>${opt}
-    </button>`;
+  const count = parseInt(document.getElementById('blankCount').value, 10);
+  currentTokens = tokenize(passageText);
+
+  const blankIndices = selectBlanks(currentTokens, count);
+  currentBlanks = blankIndices;
+
+  if (blankIndices.length === 0) {
+    alert('Not enough suitable words found. Try a longer passage.');
+    return;
+  }
+
+  const quizHTML = buildQuizHTML(currentTokens, blankIndices);
+  document.getElementById('passageDisplay').innerHTML = quizHTML;
+
+  // Show quiz section
+  const quizSection = document.getElementById('quiz-section');
+  quizSection.style.display = 'block';
+  quizSection.style.animation = 'none';
+  requestAnimationFrame(() => {
+    quizSection.style.animation = 'fadeUp 0.4s ease both';
   });
 
-  let feedbackHtml = '';
-  if (state.submitted[q]) {
-    if (state.answers[q] === data.ans) {
-      feedbackHtml = `<div class="q-feedback correct-fb show">✅ Correct! Well done.</div>`;
+  hideScore();
+  quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Enable "New Blanks" button
+  document.getElementById('newBlanksBtn').disabled  = false;
+}
+
+/* ----- HELPERS ----- */
+function escapeHTML(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function escapeAttr(str) {
+  return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+/* ===== EVENT LISTENERS ===== */
+
+// Generate quiz from passage
+document.getElementById('generateBtn').addEventListener('click', () => {
+  generateQuiz(false);
+});
+
+// New blank selection (same passage, different words)
+document.getElementById('newBlanksBtn').addEventListener('click', () => {
+  generateQuiz(true);
+});
+
+document.getElementById('newBlanksBtn2').addEventListener('click', () => {
+  generateQuiz(true);
+  document.getElementById('score-panel').style.display = 'none';
+});
+
+// Check answers
+document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+
+// Show answers
+document.getElementById('showBtn').addEventListener('click', showAnswers);
+
+// Reset quiz
+document.getElementById('resetBtn').addEventListener('click', resetQuiz);
+document.getElementById('resetBtn2').addEventListener('click', () => {
+  resetQuiz();
+  document.getElementById('score-panel').style.display = 'none';
+});
+
+// Blank count slider
+const blankCountInput   = document.getElementById('blankCount');
+const blankCountDisplay = document.getElementById('blankCountDisplay');
+blankCountInput.addEventListener('input', () => {
+  blankCountDisplay.textContent = blankCountInput.value;
+});
+
+// Dark mode toggle
+const themeBtn = document.getElementById('themeBtn');
+themeBtn.addEventListener('click', () => {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeBtn.textContent = isDark ? '☀️' : '🌙';
+});
+
+// Allow Enter key in blank inputs to jump to the next blank
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.classList.contains('blank-input')) {
+    e.preventDefault();
+    const inputs = [...document.querySelectorAll('.blank-input')];
+    const idx    = inputs.indexOf(e.target);
+    if (idx < inputs.length - 1) {
+      inputs[idx + 1].focus();
     } else {
-      feedbackHtml = `<div class="q-feedback wrong-fb show">❌ Incorrect. The correct answer is: <strong>${data.opts[data.ans]}</strong></div>`;
+      checkAnswers();
     }
   }
+});
 
-  const showResult = answered === 20;
-
-  let html = '';
-  if (showResult) {
-    const pct = Math.round((score / 20) * 100);
-    let msg = '';
-    if (score === 20) msg = '🏆 Outstanding! A perfect score!';
-    else if (score >= 16) msg = '🌟 Excellent work! You clearly understand the material.';
-    else if (score >= 12) msg = '👍 Good job! Review the questions you missed.';
-    else if (score >= 8) msg = '📚 Keep studying! Re-read the summary and try again.';
-    else msg = '💪 Don\'t give up! Review the material carefully and retake the quiz.';
-
-    html = `<div class="result-screen">
-      <div class="score-big"><span>${score}</span>/20</div>
-      <div class="score-sub">${pct}% — ${answered} questions answered</div>
-      <div class="result-msg">${msg}</div>
-      ${dotsHtml}
-      <button class="btn-primary" onclick="resetMcq(${t})">Retake Quiz</button>
-    </div>`;
-  } else {
-    html = `
-      <div class="mcq-header">
-        <span class="mcq-counter">Question ${q+1} of 20</span>
-        <span class="mcq-score-badge">Score: ${score}/${answered}</span>
-      </div>
-      ${dotsHtml}
-      <div class="question-card">
-        <div class="q-num">Question ${q+1}</div>
-        <div class="q-text">${data.q}</div>
-        <div class="options">${optionsHtml}</div>
-        ${feedbackHtml}
-      </div>
-      <div class="mcq-nav">
-        <button class="btn-secondary" onclick="goToQuestion(${t},${Math.max(0,q-1)})" ${q===0?'disabled':''}>← Previous</button>
-        ${q < 19 
-          ? `<button class="btn-primary" onclick="goToQuestion(${t},${q+1})">Next →</button>`
-          : `<button class="btn-primary" onclick="finishMcq(${t})">See Results</button>`
-        }
-      </div>`;
-  }
-
-  container.innerHTML = html;
-}
-
-function selectAnswer(t, optIdx) {
-  const state = mcqState[t];
-  const q = state.current;
-  if (state.submitted[q]) return;
-  state.answers[q] = optIdx;
-  state.submitted[q] = true;
-  renderMcqQuestion(t);
-}
-
-function goToQuestion(t, idx) {
-  mcqState[t].current = idx;
-  renderMcqQuestion(t);
-}
-
-function finishMcq(t) {
-  mcqState[t].current = 0;
-  renderMcqQuestion(t);
-}
-
-function resetMcq(t) {
-  mcqState[t] = {
-    current: 0,
-    answers: new Array(20).fill(null),
-    submitted: new Array(20).fill(false)
-  };
-  renderMcqQuestion(t);
-}
+/* ===== INIT — load default passage ===== */
+document.getElementById('passageInput').value = DEFAULT_PASSAGE;
 </script>
 </body>
   </html>
