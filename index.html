@@ -1,724 +1,129 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>بلاش غش 🧐 — Fill in the Blanks Practice</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Under Maintenance</title><style>
+*{margin:0;padding:0;box-sizing:border-box;}
 
-  :root {
-    --bg:         #f5f2eb;
-    --bg-card:    #fffdf8;
-    --bg-input:   #ffffff;
-    --border:     #e2ddd4;
-    --text:       #1a1714;
-    --text-muted: #7a7368;
-    --accent:     #c0392b;
-    --accent-2:   #e67e22;
-    --correct:    #27ae60;
-    --wrong:      #c0392b;
-    --shadow:     0 2px 16px rgba(0,0,0,0.07);
-    --shadow-lg:  0 8px 40px rgba(0,0,0,0.12);
-    --radius:     12px;
-    --radius-sm:  6px;
-    --font-head:  'Playfair Display', Georgia, serif;
-    --font-body:  'Source Serif 4', Georgia, serif;
-    --font-ui:    'DM Sans', system-ui, sans-serif;
-    --transition: 0.2s ease;
-  }
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+  font-family:'Segoe UI',sans-serif;
+  color:#fff;
+  overflow:hidden;
+}
 
-  [data-theme="dark"] {
-    --bg:         #16130f;
-    --bg-card:    #1f1b16;
-    --bg-input:   #2a251e;
-    --border:     #3a342a;
-    --text:       #f0ebe2;
-    --text-muted: #9c9080;
-    --accent:     #e05c4a;
-    --accent-2:   #f0a050;
-    --correct:    #2ecc71;
-    --wrong:      #e74c3c;
-    --shadow:     0 2px 16px rgba(0,0,0,0.3);
-    --shadow-lg:  0 8px 40px rgba(0,0,0,0.5);
-  }
+/* خلفية متحركة */
+.bg-blur{
+  position:absolute;
+  width:400px;
+  height:400px;
+  background:rgba(167,139,250,0.25);
+  filter:blur(120px);
+  border-radius:50%;
+  animation:move 8s infinite alternate ease-in-out;
+}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+.bg-blur:nth-child(2){
+  background:rgba(96,165,250,0.25);
+  animation-delay:2s;
+}
 
-  body {
-    font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.7;
-    min-height: 100vh;
-    transition: background var(--transition), color var(--transition);
-  }
+@keyframes move{
+  0%{transform:translate(-50px,-50px);}
+  100%{transform:translate(50px,50px);}
+}
 
-  header {
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: var(--shadow);
-  }
+/* الكارد */
+.card{
+  position:relative;
+  z-index:2;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:20px;
+  padding:40px 30px;
+  text-align:center;
+  width:90%;
+  max-width:400px;
+}
 
-  .logo {
-    font-family: var(--font-head);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
+/* الأيقونة */
+.icon{
+  font-size:50px;
+  margin-bottom:15px;
+  animation:pulse 1.5s infinite;
+}
 
-  .logo span { color: var(--accent); }
+@keyframes pulse{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.15);}
+}
 
-  .header-actions { display: flex; align-items: center; gap: 0.75rem; }
+/* العنوان */
+.title{
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:10px;
+  background:linear-gradient(90deg,#a78bfa,#60a5fa);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
 
-  .theme-toggle {
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    color: var(--text);
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem;
-    transition: all var(--transition);
-  }
-  .theme-toggle:hover { background: var(--border); }
+/* النص */
+.text{
+  font-size:14px;
+  opacity:0.8;
+  margin-bottom:20px;
+}
 
-  main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2.5rem 1.5rem 5rem;
-  }
+/* progress bar */
+.progress{
+  width:100%;
+  height:6px;
+  background:rgba(255,255,255,0.1);
+  border-radius:10px;
+  overflow:hidden;
+}
 
-  .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 2rem;
-    box-shadow: var(--shadow);
-    margin-bottom: 2rem;
-    animation: fadeUp 0.4s ease both;
-  }
+.progress-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#a78bfa,#60a5fa);
+  animation:load 4s infinite;
+}
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+@keyframes load{
+  0%{width:0%;}
+  50%{width:80%;}
+  100%{width:100%;}
+}
 
-  .section-label {
-    font-family: var(--font-ui);
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 0.5rem;
-  }
+/* dots */
+.dots span{
+  animation:blink 1.5s infinite;
+}
 
-  .section-title {
-    font-family: var(--font-head);
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin-bottom: 1.25rem;
-    line-height: 1.3;
-  }
+.dots span:nth-child(2){animation-delay:.2s;}
+.dots span:nth-child(3){animation-delay:.4s;}
 
-  textarea {
-    width: 100%;
-    min-height: 200px;
-    padding: 1rem 1.25rem;
-    font-family: var(--font-body);
-    font-size: 0.95rem;
-    line-height: 1.7;
-    color: var(--text);
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    resize: vertical;
-    outline: none;
-    transition: border-color var(--transition), box-shadow var(--transition);
-  }
-  textarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(192,57,43,0.12);
-  }
-
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    margin-top: 1rem;
-    align-items: center;
-  }
-
-  .blank-count-label {
-    font-family: var(--font-ui);
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .blank-count-label input[type="range"] {
-    accent-color: var(--accent);
-    width: 90px;
-  }
-
-  .btn {
-    font-family: var(--font-ui);
-    font-size: 0.85rem;
-    font-weight: 500;
-    padding: 0.55rem 1.2rem;
-    border-radius: var(--radius-sm);
-    border: none;
-    cursor: pointer;
-    transition: all var(--transition);
-    letter-spacing: 0.01em;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    white-space: nowrap;
-  }
-
-  .btn-primary {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(192,57,43,0.25);
-  }
-  .btn-primary:hover {
-    background: #a93226;
-    box-shadow: 0 4px 14px rgba(192,57,43,0.35);
-    transform: translateY(-1px);
-  }
-
-  .btn-secondary {
-    background: var(--bg-input);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-  .btn-secondary:hover { background: var(--border); transform: translateY(-1px); }
-
-  .btn-success {
-    background: var(--correct);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(39,174,96,0.25);
-  }
-  .btn-success:hover { background: #219a52; transform: translateY(-1px); }
-
-  .btn:active { transform: translateY(0); }
-  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
-
-  #quiz-section { display: none; }
-
-  .passage-display {
-    font-family: var(--font-body);
-    font-size: 1rem;
-    line-height: 1.95;
-    color: var(--text);
-  }
-  .passage-display p { margin-bottom: 1.1em; }
-
-  .blank-input {
-    display: inline-block;
-    border: none;
-    border-bottom: 2px solid var(--accent);
-    background: transparent;
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 1rem;
-    width: 110px;
-    text-align: center;
-    outline: none;
-    padding: 0 4px 1px;
-    margin: 0 3px;
-    transition: border-color var(--transition), background var(--transition);
-    vertical-align: baseline;
-  }
-  .blank-input:focus {
-    border-bottom-color: var(--accent-2);
-    background: rgba(230,126,34,0.06);
-    border-radius: 3px 3px 0 0;
-  }
-  .blank-input.correct {
-    border-bottom-color: var(--correct);
-    color: var(--correct);
-    background: rgba(39,174,96,0.07);
-    border-radius: 3px 3px 0 0;
-  }
-  .blank-input.wrong {
-    border-bottom-color: var(--wrong);
-    color: var(--wrong);
-    background: rgba(192,57,43,0.07);
-    border-radius: 3px 3px 0 0;
-  }
-  .correct-hint {
-    font-family: var(--font-ui);
-    font-size: 0.72rem;
-    color: var(--wrong);
-    margin-left: 2px;
-    font-style: italic;
-  }
-  .blank-input.revealed {
-    border-bottom-color: var(--accent-2);
-    color: var(--accent-2);
-    font-style: italic;
-    background: rgba(230,126,34,0.08);
-    border-radius: 3px 3px 0 0;
-  }
-
-  #score-panel { display: none; animation: fadeUp 0.35s ease both; }
-
-  .score-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-  }
-  .score-stat {
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 1rem;
-    text-align: center;
-  }
-  .score-stat .number {
-    font-family: var(--font-head);
-    font-size: 2.2rem;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 0.25rem;
-  }
-  .score-stat .label {
-    font-family: var(--font-ui);
-    font-size: 0.73rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .score-stat.correct-stat .number { color: var(--correct); }
-  .score-stat.wrong-stat   .number { color: var(--wrong); }
-  .score-stat.pct-stat     .number { color: var(--accent-2); }
-
-  .progress-bar-wrap {
-    background: var(--border);
-    border-radius: 99px;
-    height: 8px;
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-  }
-  .progress-bar-fill {
-    height: 100%;
-    border-radius: 99px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .score-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-
-  .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
-
-  @media (max-width: 600px) {
-    main { padding: 1.5rem 1rem 4rem; }
-    .card { padding: 1.25rem; }
-    .score-grid { grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
-    .score-stat .number { font-size: 1.6rem; }
-    .blank-input { width: 90px; }
-    .controls { flex-direction: column; align-items: flex-start; }
-    .blank-count-label { margin-left: 0; }
-  }
-</style>
-</head>
-<body>
-
-<header>
-  <div class="logo">بلاااااش<span> 🧐غش </span></div>
-  <div class="header-actions">
-    <button class="theme-toggle" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode">☀️</button>
+@keyframes blink{
+  0%,80%,100%{opacity:0;}
+  40%{opacity:1;}
+}
+</style></head><body><div class="bg-blur"></div>
+<div class="bg-blur"></div><div class="card">
+  <div class="icon">🛠️</div>  <div class="title">
+    Under Maintenance
+    <span class="dots"><span>.</span><span>.</span><span>.</span></span>
+  </div>  <div class="text">
+    We are currently upgrading the website to improve your experience.<br>
+    Please check back soon.
+  </div>  <div class="progress">
+    <div class="progress-fill"></div>
   </div>
-</header>
-
-<main>
-
-  <div class="card" id="input-section">
-    <div class="section-label">Step 1</div>
-    <h2 class="section-title">Paste or edit a reading passage</h2>
-    <textarea id="passageInput" spellcheck="false"></textarea>
-    <div class="controls">
-      <button class="btn btn-primary" id="generateBtn">⚡ Generate Quiz</button>
-      <button class="btn btn-secondary" id="newBlanksBtn" disabled>🔀 New Blank Selection</button>
-      <div class="blank-count-label">
-        Blanks: <strong id="blankCountDisplay">20</strong>
-        <input type="range" id="blankCount" min="5" max="40" value="20" />
-      </div>
-    </div>
-  </div>
-
-  <div class="card" id="quiz-section">
-    <div class="section-label">Step 2 — Fill in the Blanks</div>
-    <h2 class="section-title">Digital Habits Across Generations</h2>
-    <div class="divider"></div>
-    <div class="passage-display" id="passageDisplay"></div>
-    <div class="divider"></div>
-    <div class="controls">
-      <button class="btn btn-success" id="checkBtn">✓ Check Answers</button>
-      <button class="btn btn-secondary" id="showBtn">👁 Show Answers</button>
-      <button class="btn btn-secondary" id="resetBtn">↺ Reset Quiz</button>
-    </div>
-  </div>
-
-  <div class="card" id="score-panel">
-    <div class="section-label">Your Score</div>
-    <h2 class="section-title">Results</h2>
-    <div class="score-grid">
-      <div class="score-stat correct-stat">
-        <div class="number" id="correctCount">0</div>
-        <div class="label">Correct</div>
-      </div>
-      <div class="score-stat wrong-stat">
-        <div class="number" id="wrongCount">0</div>
-        <div class="label">Wrong</div>
-      </div>
-      <div class="score-stat pct-stat">
-        <div class="number" id="pctScore">0%</div>
-        <div class="label">Score</div>
-      </div>
-    </div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
-    </div>
-    <div class="score-actions">
-      <button class="btn btn-secondary" id="resetBtn2">↺ Try Again</button>
-      <button class="btn btn-secondary" id="newBlanksBtn2">🔀 New Blank Selection</button>
-    </div>
-  </div>
-
-</main>
-
-<script>
-/* ===== DEFAULT PASSAGE: Digital Habits Across Generations ===== */
-const DEFAULT_PASSAGE = `Today's grandparents are joining their grandchildren on social media, but the different generations' online habits couldn't be more different. In the UK the over-55s are joining Facebook in increasing numbers, meaning that they will soon be the site's second biggest user group, with 3.5 million users aged 55–64 and 2.9 million over-65s. Sheila, aged 59, says, "I joined to see what my grandchildren are doing, as my daughter posts videos and photos of them. It's a much better way to see what they're doing than waiting for letters and photos in the post. That's how we did it when I was a child, but I think I'm lucky I get to see so much more of their lives than my grandparents did."
-
-Ironically, Sheila's grandchildren are less likely to use Facebook themselves. Children under 17 in the UK are leaving the site – only 2.2 million users are under 17 – but they're not going far from their smartphones. Chloe, aged 15, even sleeps with her phone. "It's my alarm clock so I have to," she says. "I look at it before I go to sleep and as soon as I wake up." Unlike her grandmother's generation, Chloe's age group is spending so much time on their phones at home that they are missing out on spending time with their friends in real life. Sheila, on the other hand, has made contact with old friends from school she hasn't heard from in forty years. "We use Facebook to arrange to meet all over the country," she says. "It's changed my social life completely."
-
-Teenagers might have their parents to thank for their smartphone and social media addiction as their parents were the early adopters of the smartphone. Peter, 38 and father of two teenagers, reports that he used to be on his phone or laptop constantly. "I was always connected and I felt like I was always working," he says. "How could I tell my kids to get off their phones if I was always in front of a screen myself?" So, in the evenings and at weekends, he takes his SIM card out of his smartphone and puts it into an old-style mobile phone that can only make calls and send text messages. "I'm not completely cut off from the world in case of emergencies, but the important thing is I'm setting a better example to my kids and spending more quality time with them." Is it only a matter of time until the generation above and below Peter catches up with the new trend for a less digital life?`;
-
-/* ===== STOP WORDS ===== */
-const STOP_WORDS = new Set([
-  'a','an','the',
-  'in','on','at','by','for','with','about','against','between','into',
-  'through','during','before','after','above','below','to','from','up',
-  'down','out','off','over','under','again','further','then','once',
-  'of','as','whether','though','where','when','which','that','who','whom',
-  'i','me','my','myself','we','our','ours','ourselves','you','your',
-  'yours','yourself','yourselves','he','him','his','himself','she','her',
-  'hers','herself','it','its','itself','they','them','their','theirs',
-  'themselves','what','this','these','those',
-  'am','is','are','was','were','be','been','being','have','has','had',
-  'do','does','did','will','would','shall','should','may','might',
-  'must','can','could','ought','need',
-  'not','no','nor','so','yet','both','either','each','few','more',
-  'most','other','some','such','than','too','very','just','any','all',
-  'also','only','same','even','there','here','how','if','get','got',
-  'make','made','like','time','much','many','now','but','or','and',
-]);
-
-/* ===== SYNONYM DICTIONARY ===== */
-const SYNONYMS = {
-  happy:        ['glad','joyful','pleased','content','cheerful','delighted'],
-  sad:          ['unhappy','sorrowful','miserable','dejected','downcast'],
-  big:          ['large','huge','enormous','vast','great','giant'],
-  small:        ['little','tiny','miniature','petite','minor'],
-  smart:        ['intelligent','clever','bright','brilliant','wise'],
-  intelligent:  ['smart','clever','bright','brilliant','gifted'],
-  difficult:    ['hard','tough','challenging','demanding'],
-  easy:         ['simple','effortless','straightforward','uncomplicated'],
-  fast:         ['quick','rapid','swift','speedy'],
-  slow:         ['sluggish','unhurried','gradual','leisurely'],
-  start:        ['begin','commence','initiate','launch','open'],
-  end:          ['finish','conclude','stop','terminate','close','complete'],
-  afraid:       ['scared','frightened','fearful','terrified'],
-  angry:        ['mad','furious','irate','annoyed','outraged'],
-  joining:      ['connecting','entering','becoming','participating'],
-  join:         ['connect','enter','become','participate'],
-  different:    ['distinct','varied','unlike','diverse','separate'],
-  increasing:   ['growing','rising','expanding','climbing'],
-  leaving:      ['departing','exiting','quitting','abandoning'],
-  spending:     ['using','passing','devoting'],
-  missing:      ['losing','skipping','avoiding'],
-  contact:      ['touch','connection','communication','reach'],
-  arrange:      ['organise','organize','plan','schedule','set up'],
-  changed:      ['altered','transformed','affected','impacted'],
-  addiction:    ['dependence','habit','obsession','reliance'],
-  connected:    ['linked','online','engaged','attached'],
-  working:      ['operating','functioning','labouring','laboring'],
-  emergencies:  ['crises','urgencies','disasters'],
-  setting:      ['establishing','creating','providing','giving'],
-  example:      ['model','instance','demonstration','illustration'],
-  quality:      ['value','standard','worth','excellence'],
-  generation:   ['age group','cohort','era','period'],
-  trend:        ['pattern','tendency','movement','direction'],
-  digital:      ['electronic','online','virtual','technological'],
-  social:       ['communal','public','shared','collective'],
-  mobile:       ['portable','handheld','wireless','cellular'],
-  messages:     ['texts','communications','notes'],
-  completely:   ['totally','entirely','fully','wholly','absolutely'],
-  constantly:   ['always','continuously','continually','all the time'],
-  ironically:   ['paradoxically','surprisingly','unexpectedly'],
-  lucky:        ['fortunate','blessed','privileged'],
-  matter:       ['question','issue','concern','topic'],
-  early:        ['first','initial','pioneering','original'],
-  adopters:     ['users','followers','pioneers'],
-};
-
-/* ===== TOKENIZER ===== */
-function tokenize(text) {
-  const tokens = [];
-  const re = /([A-Za-z][A-Za-z'']*)|(\s+)|([^A-Za-z\s])/g;
-  let m;
-  while ((m = re.exec(text)) !== null) {
-    if      (m[1] !== undefined) tokens.push({ type: 'word',  raw: m[0], lower: m[0].toLowerCase() });
-    else if (m[2] !== undefined) tokens.push({ type: 'space', raw: m[0] });
-    else                         tokens.push({ type: 'punct', raw: m[0] });
-  }
-  return tokens;
-}
-
-/* ===== BLANK SELECTOR ===== */
-function selectBlanks(tokens, count) {
-  const eligible = [];
-  for (let i = 0; i < tokens.length; i++) {
-    const t = tokens[i];
-    if (t.type !== 'word') continue;
-    if (t.lower.length <= 2) continue;
-    if (STOP_WORDS.has(t.lower)) continue;
-    eligible.push(i);
-  }
-  if (eligible.length === 0) return [];
-  count = Math.min(count, Math.floor(eligible.length * 0.65));
-
-  const segSize  = eligible.length / count;
-  const chosen   = new Set();
-  const wordFreq = {};
-
-  for (let s = 0; s < count; s++) {
-    const segStart   = Math.floor(s * segSize);
-    const segEnd     = Math.floor((s + 1) * segSize);
-    const candidates = eligible.slice(segStart, segEnd);
-
-    for (let i = candidates.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
-    }
-
-    for (const idx of candidates) {
-      const word = tokens[idx].lower;
-      const freq = wordFreq[word] || 0;
-      const adj  = chosen.has(idx-1) || chosen.has(idx+1) ||
-                   chosen.has(idx-2) || chosen.has(idx+2);
-      if (!adj && freq < 2) {
-        chosen.add(idx);
-        wordFreq[word] = freq + 1;
-        break;
-      }
-    }
-  }
-  return [...chosen].sort((a, b) => a - b);
-}
-
-/* ===== BUILD QUIZ HTML ===== */
-function buildQuizHTML(tokens, blankIndices) {
-  const blankSet = new Set(blankIndices);
-  let html = '';
-  let blankNum = 0;
-
-  for (let i = 0; i < tokens.length; i++) {
-    const t = tokens[i];
-    if (t.type === 'space') {
-      if (t.raw.includes('\n\n') || (t.raw.match(/\n/g)||[]).length >= 2) {
-        html += '</p><p>';
-      } else {
-        html += ' ';
-      }
-    } else if (t.type === 'punct') {
-      html += escapeHTML(t.raw);
-    } else if (blankSet.has(i)) {
-      const w = Math.max(70, Math.min(150, t.raw.length * 12 + 30));
-      html += `<input type="text" class="blank-input"
-        data-index="${blankNum}"
-        data-answer="${escapeAttr(t.raw)}"
-        style="width:${w}px"
-        autocomplete="off" autocorrect="off"
-        autocapitalize="off" spellcheck="false"
-        aria-label="Blank ${blankNum + 1}" />`;
-      blankNum++;
-    } else {
-      html += escapeHTML(t.raw);
-    }
-  }
-  return '<p>' + html + '</p>';
-}
-
-/* ===== SYNONYM CHECKER ===== */
-function isAccepted(attempt, correct) {
-  const a = attempt.trim().toLowerCase();
-  const c = correct.toLowerCase();
-  if (a === c) return true;
-  if ((SYNONYMS[c]||[]).includes(a)) return true;
-  if ((SYNONYMS[a]||[]).includes(c)) return true;
-  return false;
-}
-
-/* ===== CHECK ANSWERS ===== */
-function checkAnswers() {
-  const inputs = document.querySelectorAll('.blank-input');
-  let correct = 0, wrong = 0, answered = 0;
-
-  inputs.forEach(inp => {
-    const next = inp.nextElementSibling;
-    if (next && next.classList.contains('correct-hint')) next.remove();
-    if (!inp.value.trim()) { inp.classList.remove('correct','wrong'); return; }
-
-    answered++;
-    if (isAccepted(inp.value, inp.dataset.answer)) {
-      inp.classList.add('correct'); inp.classList.remove('wrong'); correct++;
-    } else {
-      inp.classList.add('wrong'); inp.classList.remove('correct'); wrong++;
-      const hint = document.createElement('span');
-      hint.className = 'correct-hint';
-      hint.textContent = `(${inp.dataset.answer})`;
-      inp.insertAdjacentElement('afterend', hint);
-    }
-  });
-  showScore(correct, wrong, answered);
-}
-
-/* ===== SHOW ANSWERS ===== */
-function showAnswers() {
-  document.querySelectorAll('.blank-input').forEach(inp => {
-    const next = inp.nextElementSibling;
-    if (next && next.classList.contains('correct-hint')) next.remove();
-    inp.value = inp.dataset.answer;
-    inp.classList.remove('correct','wrong');
-    inp.classList.add('revealed');
-    inp.disabled = true;
-  });
-}
-
-/* ===== RESET ===== */
-function resetQuiz() {
-  document.querySelectorAll('.blank-input').forEach(inp => {
-    inp.value = '';
-    inp.classList.remove('correct','wrong','revealed');
-    inp.disabled = false;
-    const next = inp.nextElementSibling;
-    if (next && next.classList.contains('correct-hint')) next.remove();
-  });
-  hideScore();
-}
-
-/* ===== SCORE ===== */
-function showScore(correct, wrong, answered) {
-  const pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
-  document.getElementById('correctCount').textContent = correct;
-  document.getElementById('wrongCount').textContent   = wrong;
-  document.getElementById('pctScore').textContent     = pct + '%';
-  document.getElementById('progressFill').style.width = pct + '%';
-  const panel = document.getElementById('score-panel');
-  panel.style.display = 'block';
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function hideScore() {
-  document.getElementById('score-panel').style.display = 'none';
-}
-
-/* ===== GENERATE QUIZ ===== */
-let currentTokens = [];
-let passageText   = '';
-
-function generateQuiz(reusePassage = false) {
-  if (!reusePassage) {
-    passageText = document.getElementById('passageInput').value.trim();
-  }
-  if (!passageText) { alert('Please paste a reading passage first.'); return; }
-
-  const count = parseInt(document.getElementById('blankCount').value, 10);
-  currentTokens = tokenize(passageText);
-
-  const blankIndices = selectBlanks(currentTokens, count);
-  if (blankIndices.length === 0) {
-    alert('Not enough suitable words found. Try a longer passage.');
-    return;
-  }
-
-  document.getElementById('passageDisplay').innerHTML =
-    buildQuizHTML(currentTokens, blankIndices);
-
-  const qs = document.getElementById('quiz-section');
-  qs.style.display = 'block';
-  qs.style.animation = 'none';
-  requestAnimationFrame(() => { qs.style.animation = 'fadeUp 0.4s ease both'; });
-
-  hideScore();
-  document.getElementById('newBlanksBtn').disabled = false;
-  qs.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-/* ===== HELPERS ===== */
-function escapeHTML(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function escapeAttr(str) {
-  return str.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-/* ===== EVENTS ===== */
-document.getElementById('generateBtn').addEventListener('click', () => generateQuiz(false));
-document.getElementById('newBlanksBtn').addEventListener('click', () => generateQuiz(true));
-document.getElementById('newBlanksBtn2').addEventListener('click', () => {
-  generateQuiz(true);
-  document.getElementById('score-panel').style.display = 'none';
-});
-document.getElementById('checkBtn').addEventListener('click', checkAnswers);
-document.getElementById('showBtn').addEventListener('click', showAnswers);
-document.getElementById('resetBtn').addEventListener('click', resetQuiz);
-document.getElementById('resetBtn2').addEventListener('click', () => {
-  resetQuiz();
-  document.getElementById('score-panel').style.display = 'none';
-});
-
-const slider  = document.getElementById('blankCount');
-const display = document.getElementById('blankCountDisplay');
-slider.addEventListener('input', () => { display.textContent = slider.value; });
-
-document.getElementById('themeBtn').addEventListener('click', () => {
-  const html   = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.target.classList.contains('blank-input')) {
-    e.preventDefault();
-    const inputs = [...document.querySelectorAll('.blank-input')];
-    const idx    = inputs.indexOf(e.target);
-    if (idx < inputs.length - 1) inputs[idx + 1].focus();
-    else checkAnswers();
-  }
-});
-
-/* ===== INIT ===== */
-document.getElementById('passageInput').value = DEFAULT_PASSAGE;
-</script>
-</body>
-      </html>
+</div></body>
+</html>
